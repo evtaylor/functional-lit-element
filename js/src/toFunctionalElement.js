@@ -6,9 +6,7 @@ export const toFunctionalElement = (render, props = {}, styles = []) => {
             const dynamicState = {
                 _dynamicState: { type: Object }
             };
-            const allProps = Object.assign({}, dynamicState, props);
-            debugger;
-            return allProps;
+            return Object.assign({}, dynamicState, props);
         }
 
         static get styles() {
@@ -24,27 +22,29 @@ export const toFunctionalElement = (render, props = {}, styles = []) => {
 
         render() {
             super.render();
+            this._stateKey = 0;
             return render(this, this.useState);
         }
     };
 };
 
 const createUseState = (element) => {
-    let stateKey = element._stateKey;
-    element._dynamicState[stateKey] = undefined;
+    // gets called once in the constructor of the el
     const useStateInstance = function (defaultValue = null) {
-        debugger;
-        if (typeof element._dynamicState[stateKey] === 'undefined') {
-            element._dynamicState[stateKey] = defaultValue;
+        // gets called every render
+        if (typeof element._dynamicState[element._stateKey] === 'undefined') {
+            element._dynamicState = Object.assign({}, element._dynamicState, {[element._stateKey]: defaultValue});
         }
+        const currentStateKey = element._stateKey;
         const changeValue = (newValue) => {
-            debugger;
             console.log('change value', newValue);
-            element._dynamicState[stateKey] = newValue;
+            element._dynamicState = Object.assign({}, element._dynamicState, {[currentStateKey]: newValue});
         };
-        return [element._dynamicState[stateKey], changeValue];
+
+        const valueAndChanger = [element._dynamicState[element._stateKey], changeValue];
+        element._stateKey++;
+        return valueAndChanger;
     };
-    element._stateKey ++;
     return useStateInstance;
 };
 

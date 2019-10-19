@@ -9,8 +9,9 @@ const props = {
 const MainPage = (props, useState) => {
 
     const [modalOpen, setModalOpen] = useState(false);
+    const [someNum, setSomeNum] = useState(0);
 
-    console.log('render modalOpen:', modalOpen)
+    console.log('render', modalOpen, someNum)
 
     const {
         title
@@ -27,9 +28,9 @@ const MainPage = (props, useState) => {
                 cancelButtonText="Cancel"
                 .onClose="${() => setModalOpen(false)}"
                 .onConfirm="${() => {
-        alert('confirmed!');
-        setModalOpen(true)
-    }}"
+                    setModalOpen(false)
+                    setSomeNum(someNum+1)
+                }}"
             >
                 Are you sure you want to do this?
             </confirm-modal>
