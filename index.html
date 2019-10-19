@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="./node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js" defer></script>
+<script type="module" defer>
+    window.WebComponents = window.WebComponents || {
+        waitFor(cb){ addEventListener('WebComponentsReady', cb) }
+    };
+
+    WebComponents.waitFor(async () => {
+        import('./js/components/confirm-modal.js');
+        import('./js/pages/main-page.js');
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // const modalOpenButton =  document.getElementById('modal-open');
+        // const modal =  document.getElementById('modal');
+        //
+        // modal.addEventListener('open', () => {
+        //    console.log('observed open')
+        // });
+        //
+        // modal.addEventListener('close', () => {
+        //     console.log('observed close')
+        // });
+        //
+        // modal.addEventListener('confirmed', () => {
+        //     console.log('observed confirmed');
+        //     modal.close()
+        // });
+        //
+        // modalOpenButton.addEventListener('click', () => {
+        //     modal.setAttribute('isopen', 'true');
+        // })
+    })
+</script>
+<body>
+    <main-page title="My Page"></main-page>
+</body>
+</html>

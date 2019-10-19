@@ -1,0 +1,15 @@
+{
+  "name": "webcomponents",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Evan Taylor",
+  "license": "Copyright",
+  "dependencies": {
+    "@webcomponents/webcomponentsjs": "^2.3.0",
+    "lit-element": "^2.2.1"
+  },
+  "devDependencies": {
+    "@pika/web": "^0.6.1"
+  },
+  "scripts": {"prepare": "pika install"}
+}
