@@ -6,10 +6,17 @@ const props = {
     title: { type: String, reflect: true },
 };
 
-const MainPage = (props, useState) => {
+const MainPage = (props, hooks) => {
+    const { useState, useEffect } = hooks;
 
     const [modalOpen, setModalOpen] = useState(false);
     const [someNum, setSomeNum] = useState(0);
+
+    useEffect(() => {
+        setTimeout(function() {
+            console.log('done effect')
+        }, 1000);
+    }, [someNum]);
 
     console.log('render', modalOpen, someNum)
 

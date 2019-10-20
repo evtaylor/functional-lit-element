@@ -17,15 +17,54 @@ export const toFunctionalElement = (render, props = {}, styles = []) => {
             super();
             this._dynamicState = {};
             this._stateKey = 0;
+            this._hookKey = 0;
+            this._hooks = [];
+            this._hookState = [];
             this.useState = createUseState(this);
+            this.useEffect = createUseEffect(this);
         }
 
         render() {
             super.render();
             this._stateKey = 0;
-            return render(this, this.useState);
+            this._hookKey = 0;
+            const hooks = {
+                useState: this.useState,
+                useEffect: this.useEffect
+            };
+            const template = render(this, hooks);
+            this._hooks.forEach(runHook);
+            this._hooks = [];
+            return template;
         }
     };
+};
+
+const runHook = (hook) => {
+    return new Promise((resolve) => {
+        return resolve(hook())
+    });
+};
+
+const createUseEffect = (element) => {
+    return (effect, stateToWatch = []) => {
+        if (element._hookState[element._hookKey] === undefined) {
+            element._hookState[element._hookKey] = Array.of(stateToWatch.map(() => undefined));
+        }
+
+        if (stateToWatch.length === 0) {
+            element._hookState[element._hookKey] = stateToWatch;
+            element._hooks[element._hookKey] = effect;
+            return;
+        }
+
+        for(let i = 0; i < stateToWatch.length; i++) {
+            if (element._hookState[element._hookKey][i] !== stateToWatch[i]) {
+                element._hooks[element._hookKey] = effect;
+            }
+        }
+        element._hookState[element._hookKey] = stateToWatch;
+    }
 };
 
 const createUseState = (element) => {
