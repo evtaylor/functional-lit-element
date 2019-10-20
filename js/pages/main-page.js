@@ -6,8 +6,21 @@ const props = {
     title: { type: String, reflect: true },
 };
 
+const initialState = {count: 0};
+
+function reducer(state, action) {
+    switch (action.type) {
+        case 'increment':
+            return {count: state.count + 1};
+        case 'decrement':
+            return {count: state.count - 1};
+        default:
+            throw new Error();
+    }
+}
+
 const MainPage = (props, hooks) => {
-    const { useState, useEffect } = hooks;
+    const { useState, useEffect, useReducer } = hooks;
 
     const [modalOpen, setModalOpen] = useState(false);
     const [someNum, setSomeNum] = useState(0);
@@ -18,7 +31,10 @@ const MainPage = (props, hooks) => {
         }, 1000);
     }, [someNum]);
 
+    const [state, dispatch] = useReducer(reducer, initialState);
+
     console.log('render', modalOpen, someNum)
+    console.log('reducer state', state)
 
     const {
         title
@@ -36,7 +52,8 @@ const MainPage = (props, hooks) => {
                 .onClose="${() => setModalOpen(false)}"
                 .onConfirm="${() => {
                     setModalOpen(false)
-                    setSomeNum(someNum+1)
+                    // setSomeNum(someNum+1)
+                    dispatch({type: 'increment'})
                 }}"
             >
                 Are you sure you want to do this?

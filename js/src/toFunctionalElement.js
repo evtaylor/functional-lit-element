@@ -4,7 +4,8 @@ export const toFunctionalElement = (render, props = {}, styles = []) => {
     return class extends LitElement {
         static get properties() {
             const dynamicState = {
-                _dynamicState: { type: Object }
+                _dynamicState: { type: Object },
+                _dynamicReducerState: { type: Object }
             };
             return Object.assign({}, dynamicState, props);
         }
@@ -15,22 +16,30 @@ export const toFunctionalElement = (render, props = {}, styles = []) => {
 
         constructor() {
             super();
+            this._dynamicReducerState = {};
+            this._reducerStateKey = 0;
+
             this._dynamicState = {};
             this._stateKey = 0;
+
             this._hookKey = 0;
             this._hooks = [];
             this._hookState = [];
+
             this.useState = createUseState(this);
             this.useEffect = createUseEffect(this);
+            this.useReducer = createUseReducer(this);
         }
 
         render() {
             super.render();
             this._stateKey = 0;
+            this._reducerStateKey = 0;
             this._hookKey = 0;
             const hooks = {
                 useState: this.useState,
-                useEffect: this.useEffect
+                useEffect: this.useEffect,
+                useReducer: this.useReducer
             };
             const template = render(this, hooks);
             this._hooks.forEach(runHook);
@@ -44,6 +53,25 @@ const runHook = (hook) => {
     return new Promise((resolve) => {
         return resolve(hook())
     });
+};
+
+const createUseReducer = (element) => {
+    return (reducer, initialState) => {
+        if (typeof element._dynamicReducerState[element._reducerStateKey] === 'undefined') {
+            element._dynamicReducerState[element._reducerStateKey] = Object.assign({}, element._dynamicReducerState[element._reducerStateKey], initialState);
+        }
+
+        const currentStateKey = element._reducerStateKey;
+        const dispatch = (action) => {
+            // debugger;
+            const newState = reducer(element._dynamicReducerState[currentStateKey], action);
+            element._dynamicReducerState[currentStateKey] = Object.assign({}, element._dynamicReducerState[currentStateKey], newState);
+        };
+
+        const stateAndDispatch = [element._dynamicReducerState[element._reducerStateKey], dispatch];
+        element._reducerStateKey++;
+        return stateAndDispatch;
+    }
 };
 
 const createUseEffect = (element) => {
