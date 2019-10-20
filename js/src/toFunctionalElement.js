@@ -76,7 +76,7 @@ export const createContext = (defaultData) => {
         }
 
         contextData._contextName = contextName;
-        part.setValue(contextData)
+        part.setValue(contextData);
         part.commit();
         setContext(part.committer.element, contextData);
     });

@@ -56,7 +56,7 @@ const MainPage = (props, hooks) => {
     } = props;
 
     return html`
-        <div .context="${ThemeContext(themes.light)}">
+        <div ._="${ThemeContext(themes.light)}">
             <h1>${title}</h1>
             <button id="modal-open" @click="${() => setModalOpen(true)}">Open</button>
             <confirm-modal
