@@ -1,6 +1,7 @@
 // Import the LitElement base class and html helper function
 import { LitElement, html, css } from '../../web_modules/lit-element.js';
 import toFunctionalElement from '../src/toFunctionalElement.js';
+import { ThemeContext } from '../pages/main-page.js';
 
 class ConfirmModal extends LitElement {
 
@@ -203,7 +204,14 @@ const props = {
     onConfirm: { type: Object },
 };
 
-const MyConfirmModal = (props) => {
+const MyConfirmModal = (props, hooks) => {
+
+    const { useContext } = hooks;
+
+    const theme = useContext(ThemeContext);
+
+    console.log(theme);
+
     const {
         isOpen,
         title,

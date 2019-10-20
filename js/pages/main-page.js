@@ -1,6 +1,6 @@
 // Import the LitElement base class and html helper function
 import { LitElement, html, css } from '../../web_modules/lit-element.js';
-import toFunctionalElement from '../src/toFunctionalElement.js';
+import toFunctionalElement, {createContext} from '../src/toFunctionalElement.js';
 
 const props = {
     title: { type: String, reflect: true },
@@ -18,6 +18,21 @@ function reducer(state, action) {
             throw new Error();
     }
 }
+
+const themes = {
+    light: {
+        foreground: '#000000',
+        background: '#eeeeee',
+    },
+    dark: {
+        foreground: '#ffffff',
+        background: '#222222',
+    },
+};
+
+export const ThemeContext = createContext(
+    themes.dark
+);
 
 const MainPage = (props, hooks) => {
     const { useState, useEffect, useReducer } = hooks;
@@ -41,6 +56,7 @@ const MainPage = (props, hooks) => {
     } = props;
 
     return html`
+        <div .context="${ThemeContext(themes.light)}">
             <h1>${title}</h1>
             <button id="modal-open" @click="${() => setModalOpen(true)}">Open</button>
             <confirm-modal
@@ -58,6 +74,7 @@ const MainPage = (props, hooks) => {
             >
                 Are you sure you want to do this?
             </confirm-modal>
+        </div>
         `;
 }
 
