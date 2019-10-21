@@ -12,9 +12,7 @@
     "@webcomponents/webcomponentsjs": "^2.3.0",
     "rollup": "^1.25.1",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "web-component-tester": "^6.9.2",
-    "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9"
+    "web-component-tester": "^6.9.2"
   },
   "scripts": {}
 }

@@ -5,7 +5,7 @@ export default {
     // preserveSymlinks: true,
     input: ['./src/functionalElement.js'],
     output: {
-        file: 'build/index.js',
+        file: 'build/functionalElement.js',
         format: 'es',
         sourcemap: true
     },

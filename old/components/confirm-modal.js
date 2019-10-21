@@ -1,5 +1,5 @@
 // Import the LitElement base class and html helper function
-import functionalElement, { html, css } from '../../build/index.js';
+import functionalElement, { html, css } from '../../build/functionalElement.js';
 import { ThemeContext } from '../pages/main-page.js';
 
 // class ConfirmModal extends LitElement {
