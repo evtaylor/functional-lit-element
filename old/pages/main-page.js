@@ -1,6 +1,4 @@
-// Import the LitElement base class and html helper function
-import { LitElement, html, css } from '../../web_modules/lit-element.js';
-import toFunctionalElement, {createContext} from '../src/toFunctionalElement.js';
+import functionalElement, { html, css, createContext } from '../../build/index.js';
 
 const props = {
     title: { type: String, reflect: true },
@@ -78,5 +76,5 @@ const MainPage = (props, hooks) => {
         `;
 }
 
-const MyMainPage = toFunctionalElement(MainPage, props);
+const MyMainPage = functionalElement(MainPage, props);
 customElements.define('main-page', MyMainPage);

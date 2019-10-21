@@ -11,32 +11,9 @@
     };
 
     WebComponents.waitFor(async () => {
-        import('./js/components/confirm-modal.js');
-        import('./js/pages/main-page.js');
+        import('./old/components/confirm-modal.js').catch((e) => console.error(e));
+        import('./old/pages/main-page.js').catch((e) => console.error(e));;
     });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // const modalOpenButton =  document.getElementById('modal-open');
-        // const modal =  document.getElementById('modal');
-        //
-        // modal.addEventListener('open', () => {
-        //    console.log('observed open')
-        // });
-        //
-        // modal.addEventListener('close', () => {
-        //     console.log('observed close')
-        // });
-        //
-        // modal.addEventListener('confirmed', () => {
-        //     console.log('observed confirmed');
-        //     modal.close()
-        // });
-        //
-        // modalOpenButton.addEventListener('click', () => {
-        //     modal.setAttribute('isopen', 'true');
-        // })
-    })
 </script>
 <body>
     <main-page title="My Page"></main-page>

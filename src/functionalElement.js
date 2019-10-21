@@ -2,7 +2,7 @@ import { LitElement } from "lit-element";
 import { createUseState } from "./hooks/useState";
 import { createUseEffect, runEffect } from "./hooks/useEffect";
 import { createUseReducer } from "./hooks/useReducer";
-import { createUseContext } from "./hooks/useContext";
+import { createUseContext, createContext } from "./hooks/useContext";
 
 const functionalElement = (render, props = {}, styles = []) => {
     return class extends LitElement {
@@ -59,3 +59,5 @@ const functionalElement = (render, props = {}, styles = []) => {
 };
 
 export default functionalElement;
+export { createContext };
+export { css, html } from "lit-element";
