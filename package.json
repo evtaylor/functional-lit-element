@@ -1,16 +1,17 @@
 {
   "name": "webcomponents",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/functionalElement.js",
+  "module": "src/functionalElement.js",
   "author": "Evan Taylor",
-  "license": "Copyright",
+  "license": "BSD-3-Clause",
   "dependencies": {
-    "lit-element": "^2.2.1",
-    "lit-html": "^1.1.2"
+    "lit-element": "^2.2.1"
   },
   "devDependencies": {
     "@webcomponents/webcomponentsjs": "^2.3.0",
     "rollup": "^1.25.1",
+    "rollup-plugin-exclude-dependencies-from-bundle": "^1.1.2",
     "rollup-plugin-node-resolve": "^5.2.0",
     "web-component-tester": "^6.9.2"
   },

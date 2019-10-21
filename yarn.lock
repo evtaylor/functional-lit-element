@@ -3016,7 +3016,7 @@ lit-element@^2.2.1:
   dependencies:
     lit-html "^1.0.0"
 
-lit-html@^1.0.0, lit-html@^1.1.2:
+lit-html@^1.0.0:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/lit-html/-/lit-html-1.1.2.tgz#2e3560a7075210243649c888ad738eaf0daa8374"
 
@@ -4202,6 +4202,10 @@ rimraf@^2.5.4:
 rimraf@~2.2.6:
   version "2.2.8"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.2.8.tgz#e439be2aaee327321952730f99a8929e4fc50582"
+
+rollup-plugin-exclude-dependencies-from-bundle@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-exclude-dependencies-from-bundle/-/rollup-plugin-exclude-dependencies-from-bundle-1.1.2.tgz#3591abe197a9d14ce318599984993d127ded5ea6"
 
 rollup-plugin-node-resolve@^5.2.0:
   version "5.2.0"
