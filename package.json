@@ -10,10 +10,11 @@
   },
   "devDependencies": {
     "@webcomponents/webcomponentsjs": "^2.3.0",
+    "mocha": "^6.2.2",
     "rollup": "^1.25.1",
     "rollup-plugin-exclude-dependencies-from-bundle": "^1.1.2",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "web-component-tester": "^6.9.2"
+    "showroom": "^0.9.3"
   },
   "scripts": {}
 }
