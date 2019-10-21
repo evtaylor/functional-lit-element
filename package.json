@@ -9,13 +9,7 @@
     "lit-html": "^1.1.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.4",
-    "@babel/node": "^7.6.3",
-    "@babel/preset-env": "^7.6.3",
-    "@webcomponents/webcomponentsjs": "^2.3.0",
-    "mocha": "^6.2.2"
+    "web-component-tester": "^6.9.2"
   },
-  "scripts": {
-    "test": "mocha --require @babel/register"
-  }
+  "scripts": {}
 }

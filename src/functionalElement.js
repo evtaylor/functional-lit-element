@@ -1,5 +1,8 @@
 import { LitElement } from "lit-element";
-import { directive, PropertyPart } from "lit-html";
+import { createUseState } from "./hooks/useState";
+import { createUseEffect, runEffect } from "./hooks/useEffect";
+import { createUseReducer } from "./hooks/useReducer";
+import { createUseContext } from "./hooks/useContext";
 
 const functionalElement = (render, props = {}, styles = []) => {
     return class extends LitElement {
@@ -48,7 +51,7 @@ const functionalElement = (render, props = {}, styles = []) => {
                 useContext: this.useContext
             };
             const template = render(this, hooks);
-            this._hooks.forEach(runHook);
+            this._hooks.forEach(runEffect);
             this._hooks = [];
             return template;
         }
