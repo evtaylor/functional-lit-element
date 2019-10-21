@@ -1,8 +1,8 @@
 {
   "name": "webcomponents",
   "version": "1.0.0",
-  "main": "src/functionalElement.js",
-  "module": "src/functionalElement.js",
+  "main": "build/functionalElement.js",
+  "module": "build/functionalElement.js",
   "author": "Evan Taylor",
   "license": "BSD-3-Clause",
   "dependencies": {
