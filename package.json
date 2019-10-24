@@ -6,7 +6,8 @@
   "author": "Evan Taylor",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "lit-element": "^2.2.1"
+    "lit-element": "^2.2.1",
+    "sinon": "^7.5.0"
   },
   "devDependencies": {
     "@webcomponents/webcomponentsjs": "^2.3.0",
@@ -16,5 +17,7 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "showroom": "^0.9.3"
   },
-  "scripts": {}
+  "scripts": {
+    "test": "npx mocha --recursive \"./test/*test.js\" --exit"
+  }
 }

@@ -1,5 +1,7 @@
 const showroom = require('showroom/puppeteer')();
+// const showroom = require('showroom/puppeteer')({headless:false});
 const assert = require('assert');
+const sinon = require('sinon');
 
 describe('test-component', () => {
     before(async function() {
@@ -13,13 +15,40 @@ describe('test-component', () => {
     });
 
     beforeEach(async function () {
-        await showroom.setTestSubject('test-element');
     });
 
-    it('should do stuff', async function() {
-        await showroom.setAttribute('title', 'Cool Title');
+    it('do basic render', async function() {
+        await showroom.setTestSubject('test-element');
+
+        // const component = await showroom.setAttribute('title', 'Cool Title');
+        // const result = await(await showroom.page.evaluate((target, name) => {
+        //     return target
+        // }, component));
         const p = await showroom.find('// p');
         const text = await showroom.getTextContent(p);
         assert.strictEqual(text, "Hello World");
+    });
+
+    it('should render from attributes', async function() {
+        await showroom.setTestSubject('test-element-with-props');
+
+        const checkbox = await showroom.find('// input');
+        const p = await showroom.find('// p');
+        const button = await showroom.find('// button');
+
+        // const mockFn = sinon.spy();
+
+        await showroom.setAttribute('testString', 'Bar');
+        await showroom.setAttribute('testBool', true);
+
+        const isChecked = await showroom.hasAttribute('checked', checkbox);
+        const pText = await showroom.getTextContent(p);
+        await showroom.trigger('clickButton');
+
+        const updatedClickCount = await showroom.getProperty('_clickedCount');
+
+        assert.strictEqual(isChecked, true);
+        assert.strictEqual(pText, "Hello Bar");
+        assert.strictEqual(updatedClickCount, 1);
     });
 });
