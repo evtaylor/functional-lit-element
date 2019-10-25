@@ -1,5 +1,4 @@
 
-
 export const createUseState = (element) => {
     // gets called once in the constructor of the el
     return (defaultValue = null) => {

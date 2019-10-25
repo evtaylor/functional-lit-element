@@ -1,5 +1,4 @@
 
-
 export const createUseEffect = (element) => {
     return (effect, stateToWatch = []) => {
         if (element._hookState[element._hookKey] === undefined) {
@@ -9,6 +8,7 @@ export const createUseEffect = (element) => {
         if (stateToWatch.length === 0) {
             element._hookState[element._hookKey] = stateToWatch;
             element._hooks[element._hookKey] = effect;
+            element._hookKey++;
             return;
         }
 
@@ -18,6 +18,7 @@ export const createUseEffect = (element) => {
             }
         }
         element._hookState[element._hookKey] = stateToWatch;
+        element._hookKey++;
     }
 };
 

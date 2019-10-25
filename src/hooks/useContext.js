@@ -1,5 +1,3 @@
-import {directive, PropertyPart} from "lit-html";
-
 export const createUseContext = (element) => {
     return (context) => {
         const { ['_contextName']: contextName, ...contextData } = element._context[context._contextName];
@@ -7,20 +5,24 @@ export const createUseContext = (element) => {
     }
 };
 
-export const createContext = (defaultData) => {
-    const contextName = weakUUID();
-    const context = directive((contextData = defaultData) => (part) => {
-        if (!(part instanceof PropertyPart)) {
-            throw new Error('context directive can only be used in property bindings');
-        }
+export const createContextFactory = (dependencies) => {
+    const {directive, PropertyPart} = dependencies;
 
-        contextData._contextName = contextName;
-        part.setValue(contextData);
-        part.commit();
-        setContext(part.committer.element, contextData);
-    });
-    context._contextName = contextName;
-    return context;
+    export const createContext = (defaultData) => {
+        const contextName = weakUUID();
+        const context = directive((contextData = defaultData) => (part) => {
+            if (!(part instanceof PropertyPart)) {
+                throw new Error('context directive can only be used in property bindings');
+            }
+
+            contextData._contextName = contextName;
+            part.setValue(contextData);
+            part.commit();
+            setContext(part.committer.element, contextData);
+        });
+        context._contextName = contextName;
+        return context;
+    };
 };
 
 const setContext = (element, context) => {
