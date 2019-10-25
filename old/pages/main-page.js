@@ -1,4 +1,4 @@
-import functionalElement, { html, css, createContext } from '../../build/functionalElement.js';
+import functionalElement, { html, css, createContext } from '../../dist/web/functionalElement.js';
 
 const props = {
     title: { type: String, reflect: true },

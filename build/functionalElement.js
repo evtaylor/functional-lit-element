@@ -30,6 +30,7 @@ const createUseEffect = (element) => {
         if (stateToWatch.length === 0) {
             element._hookState[element._hookKey] = stateToWatch;
             element._hooks[element._hookKey] = effect;
+            element._hookKey++;
             return;
         }
 
@@ -39,6 +40,7 @@ const createUseEffect = (element) => {
             }
         }
         element._hookState[element._hookKey] = stateToWatch;
+        element._hookKey++;
     }
 };
 
@@ -74,20 +76,24 @@ const createUseContext = (element) => {
     }
 };
 
-const createContext = (defaultData) => {
-    const contextName = weakUUID();
-    const context = directive((contextData = defaultData) => (part) => {
-        if (!(part instanceof PropertyPart)) {
-            throw new Error('context directive can only be used in property bindings');
-        }
+const createContextFactory = (dependencies) => {
+    const {directive, PropertyPart} = dependencies;
 
-        contextData._contextName = contextName;
-        part.setValue(contextData);
-        part.commit();
-        setContext(part.committer.element, contextData);
-    });
-    context._contextName = contextName;
-    return context;
+    return (defaultData) => {
+        const contextName = weakUUID();
+        const context = directive((contextData = defaultData) => (part) => {
+            if (!(part instanceof PropertyPart)) {
+                throw new Error('context directive can only be used in property bindings');
+            }
+
+            contextData._contextName = contextName;
+            part.setValue(contextData);
+            part.commit();
+            setContext(part.committer.element, contextData);
+        });
+        context._contextName = contextName;
+        return context;
+    };
 };
 
 const setContext = (element, context) => {
@@ -116,59 +122,66 @@ const weakUUID = () => {
         s4() + '-' + s4() + s4() + s4();
 };
 
-const functionalElement = (render, props = {}, styles = []) => {
-    return class extends LitElement {
-        static get properties() {
-            const dynamicState = {
-                _dynamicState: { type: Object },
-                _dynamicReducerState: { type: Object },
-                _context: { type: Object }
-            };
-            return Object.assign({}, dynamicState, props);
-        }
+var functionalElementFactory = (dependencies) => {
+    const { LitElement, createUseState, createUseEffect, runEffect, createUseReducer, createUseContext } = dependencies;
 
-        static get styles() {
-            return styles;
-        }
+    return (render, props = {}, styles = []) => {
+        return class extends LitElement {
+            static get properties() {
+                const dynamicState = {
+                    _dynamicState: {type: Object},
+                    _dynamicReducerState: {type: Object},
+                    _context: {type: Object}
+                };
+                return Object.assign({}, dynamicState, props);
+            }
 
-        constructor() {
-            super();
-            this._dynamicReducerState = {};
-            this._reducerStateKey = 0;
+            static get styles() {
+                return styles;
+            }
 
-            this._dynamicState = {};
-            this._stateKey = 0;
+            constructor() {
+                super();
+                this._dynamicReducerState = {};
+                this._reducerStateKey = 0;
 
-            this._hookKey = 0;
-            this._hooks = [];
-            this._hookState = [];
+                this._dynamicState = {};
+                this._stateKey = 0;
 
-            this._context = {};
+                this._hookKey = 0;
+                this._hooks = [];
+                this._hookState = [];
 
-            this.useState = createUseState(this);
-            this.useEffect = createUseEffect(this);
-            this.useReducer = createUseReducer(this);
-            this.useContext = createUseContext(this);
-        }
+                this._context = {};
 
-        render() {
-            super.render();
-            this._stateKey = 0;
-            this._reducerStateKey = 0;
-            this._hookKey = 0;
-            const hooks = {
-                useState: this.useState,
-                useEffect: this.useEffect,
-                useReducer: this.useReducer,
-                useContext: this.useContext
-            };
-            const template = render(this, hooks);
-            this._hooks.forEach(runEffect);
-            this._hooks = [];
-            return template;
-        }
+                this.useState = createUseState(this);
+                this.useEffect = createUseEffect(this);
+                this.useReducer = createUseReducer(this);
+                this.useContext = createUseContext(this);
+            }
+
+            render() {
+                super.render();
+                this._stateKey = 0;
+                this._reducerStateKey = 0;
+                this._hookKey = 0;
+                const hooks = {
+                    useState: this.useState,
+                    useEffect: this.useEffect,
+                    useReducer: this.useReducer,
+                    useContext: this.useContext
+                };
+                const template = render(this, hooks);
+                this._hooks.forEach(runEffect);
+                this._hooks = [];
+                return template;
+            }
+        };
     };
 };
+
+const createContext = createContextFactory({directive, PropertyPart});
+const functionalElement = functionalElementFactory({ LitElement, createUseState, createUseEffect, runEffect, createUseReducer, createUseContext });
 
 export default functionalElement;
 export { createContext };

@@ -5,7 +5,7 @@ export default [
     {
         // If using any exports from a symlinked project, uncomment the following:
         // preserveSymlinks: true,
-        input: ['./src/functionalElement.js'],
+        input: ['./src/index.js'],
         output: {
             file: 'dist/web/functionalElement.js',
             format: 'es',
@@ -18,7 +18,7 @@ export default [
     {
         // If using any exports from a symlinked project, uncomment the following:
         // preserveSymlinks: true,
-        input: ['./src/functionalElement.js'],
+        input: ['./src/index.js'],
         output: {
             file: './build/functionalElement.js',
             format: 'es',

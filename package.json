@@ -22,6 +22,7 @@
     "showroom": "^0.9.3"
   },
   "scripts": {
-    "test": "npx mocha --recursive \"./test/*test.js\" --exit --require @babel/register --require @babel/polyfill"
+    "test": "npx mocha --recursive \"./test/*test.js\" --exit --require @babel/register --require @babel/polyfill",
+    "build": "npx rollup -c"
   }
 }
