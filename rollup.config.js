@@ -1,5 +1,6 @@
 import resolve from 'rollup-plugin-node-resolve';
 import excludeDependenciesFromBundle from "rollup-plugin-exclude-dependencies-from-bundle";
+import minify from 'rollup-plugin-babel-minify';
 
 export default [
     {
@@ -7,12 +8,15 @@ export default [
         // preserveSymlinks: true,
         input: ['./src/index.js'],
         output: {
-            file: 'dist/web/functionalElement.js',
+            file: 'dist/web/functionalElement.min.js',
             format: 'es',
             sourcemap: true
         },
         plugins: [
-            resolve()
+            resolve(),
+            minify({
+                comments: false
+            })
         ]
     },
     {
