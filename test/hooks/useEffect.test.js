@@ -62,15 +62,18 @@ describe('useEffect', () => {
         assert(anEffect.calledOnce)
     });
 
-    it('handles effects that fail', async function() {
+    it('runs effect only once empty state provided', async function() {
         const element = getTestComponent();
         const useEffect = createUseEffect(element);
-        const anEffect = () => { throw new Error() };
-        const state = 1;
+        const anEffect = sinon.spy();
 
-        useEffect(anEffect, [state]);
+        useEffect(anEffect, []);
         element.render();
 
+        useEffect(anEffect, []);
+        element.render();
+
+        assert(anEffect.calledOnce)
     });
 });
 

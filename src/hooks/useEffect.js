@@ -17,6 +17,10 @@ export const createUseEffect = (element) => {
 
     const effectStateHasChanged = (stateToWatch, key) => {
         const effectState = getEffectState(key);
+        if (effectState.length === 0) {
+            return false;
+        }
+
         for(let i = 0; i < stateToWatch.length; i++) {
             if (effectState[i] !== stateToWatch[i]) {
                 return true;
@@ -26,19 +30,23 @@ export const createUseEffect = (element) => {
     };
 
     // useEffect hook
-    return (effect, stateToWatch = []) => {
-        const currentKey = element._effectKey;
-        if (getEffectState(currentKey) === undefined) {
-            setEffectState(currentKey, Array.of(stateToWatch.map(() => undefined)));
-        }
-
-        if (stateToWatch.length === 0) {
-            setEffectState(currentKey, stateToWatch);
+    return (effect, stateToWatch = undefined) => {
+        // If no state to watch, run effect every time
+        if (stateToWatch === undefined) {
             addEffect(effect);
-            element._effectKey++;
             return;
         }
 
+        const currentKey = element._effectKey;
+
+        // If first time useEffect called, set the effect state to watch and run effect
+        if (getEffectState(currentKey) === undefined) {
+            setEffectState(currentKey, stateToWatch);
+            addEffect(effect);
+            return;
+        }
+
+        // see if state has changed to decide whether effect should run again
         if (effectStateHasChanged(stateToWatch, currentKey)) {
             addEffect(effect);
         }
