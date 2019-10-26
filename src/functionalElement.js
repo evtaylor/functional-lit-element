@@ -1,5 +1,5 @@
 export default (dependencies) => {
-    const { LitElement, createUseState, createUseEffect, runEffect, createUseReducer, createUseContext } = dependencies;
+    const { LitElement, createUseState, createUseEffect, createUseReducer, createUseContext } = dependencies;
 
     return (render, props = {}, styles = []) => {
         return class extends LitElement {
@@ -19,38 +19,47 @@ export default (dependencies) => {
             constructor() {
                 super();
                 this._dynamicReducerState = {};
+                this._dynamicState = new Map();
+                this._context = {};
+
                 this._reducerStateKey = 0;
-
-                this._dynamicState = {};
                 this._stateKey = 0;
-
                 this._hookKey = 0;
                 this._hooks = [];
                 this._hookState = [];
+            }
 
-                this._context = {};
+            _resetHooks() {
+                this._stateKey = 0;
+                this._reducerStateKey = 0;
+                this._hookKey = 0;
+                this._hooks = [];
+            }
 
-                this.useState = createUseState(this);
-                this.useEffect = createUseEffect(this);
-                this.useReducer = createUseReducer(this);
-                this.useContext = createUseContext(this);
+            _runEffects() {
+                const effectPromises = this._hooks.map((effect) => {
+                    return new Promise((resolve, reject) => {
+                        try {
+                            return resolve(effect());
+                        } catch (e) {
+                            reject(e);
+                        }
+                    });
+                });
+                return effectPromises;
             }
 
             render() {
                 super.render();
-                this._stateKey = 0;
-                this._reducerStateKey = 0;
-                this._hookKey = 0;
+                this._runEffects();
+                this._resetHooks();
                 const hooks = {
-                    useState: this.useState,
-                    useEffect: this.useEffect,
-                    useReducer: this.useReducer,
-                    useContext: this.useContext
+                    useState: createUseState(this),
+                    useEffect: createUseEffect(this),
+                    useReducer: createUseReducer(this),
+                    useContext: createUseContext(this)
                 };
-                const template = render(this, hooks);
-                this._hooks.forEach(runEffect);
-                this._hooks = [];
-                return template;
+                return render(this, hooks);
             }
         };
     };

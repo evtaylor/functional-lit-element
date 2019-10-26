@@ -3,19 +3,29 @@ export { css, html } from 'lit-element';
 import { directive, PropertyPart } from 'lit-html';
 
 const createUseState = (element) => {
-    // gets called once in the constructor of the el
+
+    const getState = (key) => {
+        return element._dynamicState.get(key);
+    };
+
+    const setState = (key, value)  => {
+        const newState = new Map(Array.from(element._dynamicState.entries()));
+        newState.set(key, value);
+        element._dynamicState = newState;
+    };
+
     return (defaultValue = null) => {
-        // gets called every render
-        if (typeof element._dynamicState[element._stateKey] === 'undefined') {
-            element._dynamicState = Object.assign({}, element._dynamicState, {[element._stateKey]: defaultValue});
-        }
         const currentStateKey = element._stateKey;
+
+        if (getState(currentStateKey) === undefined) {
+            setState(currentStateKey, defaultValue);
+        }
+
         const changeValue = (newValue) => {
-            console.log('change value', newValue);
-            element._dynamicState = Object.assign({}, element._dynamicState, {[currentStateKey]: newValue});
+            setState(currentStateKey, newValue);
         };
 
-        const valueAndChanger = [element._dynamicState[element._stateKey], changeValue];
+        const valueAndChanger = [getState(currentStateKey), changeValue];
         element._stateKey++;
         return valueAndChanger;
     };
@@ -78,7 +88,7 @@ const createUseContext = (element) => {
 
 const createContextFactory = (dependencies) => {
     const {directive, PropertyPart} = dependencies;
-
+    //createContext
     return (defaultData) => {
         const contextName = weakUUID();
         const context = directive((contextData = defaultData) => (part) => {
@@ -143,38 +153,41 @@ var functionalElementFactory = (dependencies) => {
             constructor() {
                 super();
                 this._dynamicReducerState = {};
+                this._dynamicState = new Map();
+                this._context = {};
+
                 this._reducerStateKey = 0;
-
-                this._dynamicState = {};
                 this._stateKey = 0;
-
                 this._hookKey = 0;
                 this._hooks = [];
                 this._hookState = [];
+            }
 
-                this._context = {};
+            _resetHooks() {
+                this._stateKey = 0;
+                this._reducerStateKey = 0;
+                this._hookKey = 0;
+            }
 
-                this.useState = createUseState(this);
-                this.useEffect = createUseEffect(this);
-                this.useReducer = createUseReducer(this);
-                this.useContext = createUseContext(this);
+            _runEffects() {
+                this._hooks.forEach((effect) => {
+                    return new Promise((resolve) => {
+                        return resolve(effect())
+                    });
+                });
             }
 
             render() {
                 super.render();
-                this._stateKey = 0;
-                this._reducerStateKey = 0;
-                this._hookKey = 0;
+                this._resetHooks();
+                this._runEffects();
                 const hooks = {
-                    useState: this.useState,
-                    useEffect: this.useEffect,
-                    useReducer: this.useReducer,
-                    useContext: this.useContext
+                    useState: createUseState(this),
+                    useEffect: createUseEffect(this),
+                    useReducer: createUseReducer(this),
+                    useContext: createUseContext(this)
                 };
-                const template = render(this, hooks);
-                this._hooks.forEach(runEffect);
-                this._hooks = [];
-                return template;
+                return render(this, hooks);
             }
         };
     };

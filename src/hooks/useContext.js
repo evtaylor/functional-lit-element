@@ -7,7 +7,7 @@ export const createUseContext = (element) => {
 
 export const createContextFactory = (dependencies) => {
     const {directive, PropertyPart} = dependencies;
-
+    //createContext
     return (defaultData) => {
         const contextName = weakUUID();
         const context = directive((contextData = defaultData) => (part) => {

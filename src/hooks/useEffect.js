@@ -21,9 +21,3 @@ export const createUseEffect = (element) => {
         element._hookKey++;
     }
 };
-
-export const runEffect = (hook) => {
-    return new Promise((resolve) => {
-        return resolve(hook())
-    });
-};

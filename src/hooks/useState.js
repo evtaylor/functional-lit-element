@@ -1,18 +1,29 @@
 
 export const createUseState = (element) => {
-    // gets called once in the constructor of the el
+
+    const getState = (key) => {
+        return element._dynamicState.get(key);
+    };
+
+    const setState = (key, value)  => {
+        const newState = new Map(Array.from(element._dynamicState.entries()));
+        newState.set(key, value);
+        element._dynamicState = newState;
+    };
+
+    // the useState hook
     return (defaultValue = null) => {
-        // gets called every render
-        if (typeof element._dynamicState[element._stateKey] === 'undefined') {
-            element._dynamicState = Object.assign({}, element._dynamicState, {[element._stateKey]: defaultValue});
-        }
         const currentStateKey = element._stateKey;
+
+        if (getState(currentStateKey) === undefined) {
+            setState(currentStateKey, defaultValue);
+        }
+
         const changeValue = (newValue) => {
-            console.log('change value', newValue);
-            element._dynamicState = Object.assign({}, element._dynamicState, {[currentStateKey]: newValue});
+            setState(currentStateKey, newValue)
         };
 
-        const valueAndChanger = [element._dynamicState[element._stateKey], changeValue];
+        const valueAndChanger = [getState(currentStateKey), changeValue];
         element._stateKey++;
         return valueAndChanger;
     };
