@@ -1,23 +1,49 @@
 
 export const createUseEffect = (element) => {
+
+    const getEffectState = (key) => {
+        return element._effectsState.get(key);
+    };
+
+    const setEffectState = (key, value)  => {
+        const newState = new Map(Array.from(element._effectsState.entries()));
+        newState.set(key, value);
+        element._effectsState = newState;
+    };
+
+    const addEffect = (effect) => {
+        element._effects.push(effect);
+    };
+
+    const effectStateHasChanged = (stateToWatch, key) => {
+        const effectState = getEffectState(key);
+        for(let i = 0; i < stateToWatch.length; i++) {
+            if (effectState[i] !== stateToWatch[i]) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    // useEffect hook
     return (effect, stateToWatch = []) => {
-        if (element._hookState[element._hookKey] === undefined) {
-            element._hookState[element._hookKey] = Array.of(stateToWatch.map(() => undefined));
+        const currentKey = element._effectKey;
+        if (getEffectState(currentKey) === undefined) {
+            setEffectState(currentKey, Array.of(stateToWatch.map(() => undefined)));
         }
 
         if (stateToWatch.length === 0) {
-            element._hookState[element._hookKey] = stateToWatch;
-            element._hooks[element._hookKey] = effect;
-            element._hookKey++;
+            setEffectState(currentKey, stateToWatch);
+            addEffect(effect);
+            element._effectKey++;
             return;
         }
 
-        for(let i = 0; i < stateToWatch.length; i++) {
-            if (element._hookState[element._hookKey][i] !== stateToWatch[i]) {
-                element._hooks[element._hookKey] = effect;
-            }
+        if (effectStateHasChanged(stateToWatch, currentKey)) {
+            addEffect(effect);
         }
-        element._hookState[element._hookKey] = stateToWatch;
-        element._hookKey++;
+
+        setEffectState(currentKey, stateToWatch);
+        element._effectKey++;
     }
 };

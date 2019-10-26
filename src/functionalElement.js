@@ -24,20 +24,20 @@ export default (dependencies) => {
 
                 this._reducerStateKey = 0;
                 this._stateKey = 0;
-                this._hookKey = 0;
-                this._hooks = [];
-                this._hookState = [];
+                this._effectKey = 0;
+                this._effects = [];
+                this._effectsState = new Map();
             }
 
             _resetHooks() {
                 this._stateKey = 0;
                 this._reducerStateKey = 0;
-                this._hookKey = 0;
-                this._hooks = [];
+                this._effectKey = 0;
+                this._effects = [];
             }
 
             _runEffects() {
-                const effectPromises = this._hooks.map((effect) => {
+                return this._effects.map((effect) => {
                     return new Promise((resolve, reject) => {
                         try {
                             return resolve(effect());
@@ -46,7 +46,6 @@ export default (dependencies) => {
                         }
                     });
                 });
-                return effectPromises;
             }
 
             render() {

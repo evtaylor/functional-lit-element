@@ -11,7 +11,7 @@ export const createUseState = (element) => {
         element._dynamicState = newState;
     };
 
-    // the useState hook
+    // useState hook
     return (defaultValue = null) => {
         const currentStateKey = element._stateKey;
 
