@@ -58,6 +58,7 @@ export default (dependencies) => {
                     useReducer: createUseReducer(this),
                     useContext: createUseContext(this)
                 };
+                // Todo: only pass props, not `this`
                 return render(this, hooks);
             }
         };

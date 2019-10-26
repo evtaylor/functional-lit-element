@@ -16,7 +16,6 @@ const getTestComponent = () => {
         },
         createUseState: () => {},
         createUseEffect: () => {},
-        runEffect: runEffect,
         createUseReducer: () => {},
         createUseContext: () => {}
     });

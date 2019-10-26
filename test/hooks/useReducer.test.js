@@ -78,7 +78,6 @@ const getTestComponent = () => {
         },
         createUseState: () => {},
         createUseEffect: () => {},
-        runEffect: () => {},
         createUseReducer: () => {},
         createUseContext: () => {}
     });

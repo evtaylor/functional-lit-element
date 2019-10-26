@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { createUseEffect, runEffect } from '../../src/hooks/useEffect';
+import { createUseEffect } from '../../src/hooks/useEffect';
 import functionalElementFactory from '../../src/functionalElement';
 
 describe('useEffect', () => {
@@ -84,7 +84,6 @@ const getTestComponent = () => {
         },
         createUseState: () => {},
         createUseEffect: () => {},
-        runEffect: runEffect,
         createUseReducer: () => {},
         createUseContext: () => {}
     });
