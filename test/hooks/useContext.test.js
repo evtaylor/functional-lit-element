@@ -1,11 +1,35 @@
 import assert from 'assert';
-import { createUseContext } from '../../src/hooks/useContext';
+import { createUseContext, createContextFactory } from '../../src/hooks/useContext';
 import functionalElementFactory from '../../src/functionalElement';
-import {runEffect} from "../../src/hooks/useEffect";
+import sinon from "sinon";
 
-describe('useState', () => {
-    it('returns updated value when changed on next render', async function () {
+describe('useContext', () => {
+    it('createContext creates basic context with name', async function () {
+        const directiveFake = sinon.fake.returns(() => {});
+        const PropertyPart = class{};
+        const contextData = {
+            hello: "world"
+        };
+
+        const createContext = createContextFactory({directive: directiveFake, PropertyPart});
+        const context = createContext(contextData);
+        assert(context._contextName.length > 0)
+    });
+
+    it('useContext returns data from context property', async function () {
         const testElement = getTestComponent();
+        const testContextName = 'abc123';
+        const fakeContextData = {
+            hello: "world"
+        };
+        const fakeContext = {
+            _contextName: testContextName
+        };
+        testElement._context[testContextName] = fakeContextData;
+
+        const useContext = createUseContext(testElement);
+        const result = useContext(fakeContext);
+        assert.deepStrictEqual(result, fakeContextData)
     });
 });
 
