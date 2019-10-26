@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<script src="./node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js" defer></script>
+<script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js" defer></script>
 <script type="module" defer>
     window.WebComponents = window.WebComponents || {
         waitFor(cb){ addEventListener('WebComponentsReady', cb) }
     };
 
     WebComponents.waitFor(async () => {
-        import('./old/components/confirm-modal.js').catch((e) => console.error(e));
-        import('./old/pages/main-page.js').catch((e) => console.error(e));
+        import('./confirm-modal.js').catch((e) => console.error(e));
+        import('./main-page.js').catch((e) => console.error(e));
     });
 </script>
 <body>
