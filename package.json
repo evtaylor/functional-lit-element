@@ -1,5 +1,5 @@
 {
-  "name": "webcomponents",
+  "name": "@evtaylor/functional-lit-element",
   "version": "0.1.0",
   "main": "build/functionalElement.js",
   "module": "build/functionalElement.js",
@@ -27,7 +27,8 @@
   "scripts": {
     "test": "npx mocha --recursive \"./test/**/*test.js\" --exit --require @babel/register --require @babel/polyfill",
     "build": "npx rollup -c",
-    "build:test": "npx @pika/web && npx rollup -c browser.rollup.config.js"
+    "build:test": "npx @pika/web && npx rollup -c browser.rollup.config.js",
+    "build:examples": "npm run build:test"
   },
   "peerDependencies": {
     "lit-element": "2.x"
@@ -37,5 +38,18 @@
       "lit-element",
       "lit-html"
     ]
-  }
+  },
+  "description": "A wrapper for [LitElement](https://github.com/Polymer/lit-element) which provides an API similar to React functional components.",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evtaylor/functional-lit-element.git"
+  },
+  "bugs": {
+    "url": "https://github.com/evtaylor/functional-lit-element/issues"
+  },
+  "homepage": "https://github.com/evtaylor/functional-lit-element#readme"
 }
