@@ -18,7 +18,7 @@ export default (dependencies) => {
 
             constructor() {
                 super();
-                this._dynamicReducerState = {};
+                this._dynamicReducerState = new Map();
                 this._dynamicState = new Map();
                 this._context = {};
 

@@ -14,6 +14,7 @@ const createUseState = (element) => {
         element._dynamicState = newState;
     };
 
+    // useState hook
     return (defaultValue = null) => {
         const currentStateKey = element._stateKey;
 
@@ -32,32 +33,60 @@ const createUseState = (element) => {
 };
 
 const createUseEffect = (element) => {
-    return (effect, stateToWatch = []) => {
-        if (element._hookState[element._hookKey] === undefined) {
-            element._hookState[element._hookKey] = Array.of(stateToWatch.map(() => undefined));
-        }
 
-        if (stateToWatch.length === 0) {
-            element._hookState[element._hookKey] = stateToWatch;
-            element._hooks[element._hookKey] = effect;
-            element._hookKey++;
-            return;
+    const getEffectState = (key) => {
+        return element._effectsState.get(key);
+    };
+
+    const setEffectState = (key, value)  => {
+        const newState = new Map(Array.from(element._effectsState.entries()));
+        newState.set(key, value);
+        element._effectsState = newState;
+    };
+
+    const addEffect = (effect) => {
+        element._effects.push(effect);
+    };
+
+    const effectStateHasChanged = (stateToWatch, key) => {
+        const effectState = getEffectState(key);
+        if (effectState.length === 0) {
+            return false;
         }
 
         for(let i = 0; i < stateToWatch.length; i++) {
-            if (element._hookState[element._hookKey][i] !== stateToWatch[i]) {
-                element._hooks[element._hookKey] = effect;
+            if (effectState[i] !== stateToWatch[i]) {
+                return true;
             }
         }
-        element._hookState[element._hookKey] = stateToWatch;
-        element._hookKey++;
-    }
-};
+        return false;
+    };
 
-const runEffect = (hook) => {
-    return new Promise((resolve) => {
-        return resolve(hook())
-    });
+    // useEffect hook
+    return (effect, stateToWatch = undefined) => {
+        // If no state to watch, run effect every time
+        if (stateToWatch === undefined) {
+            addEffect(effect);
+            return;
+        }
+
+        const currentKey = element._effectKey;
+
+        // If first time useEffect called, set the effect state to watch and run effect
+        if (getEffectState(currentKey) === undefined) {
+            setEffectState(currentKey, stateToWatch);
+            addEffect(effect);
+            return;
+        }
+
+        // see if state has changed to decide whether effect should run again
+        if (effectStateHasChanged(stateToWatch, currentKey)) {
+            addEffect(effect);
+        }
+
+        setEffectState(currentKey, stateToWatch);
+        element._effectKey++;
+    }
 };
 
 const createUseReducer = (element) => {
@@ -133,7 +162,7 @@ const weakUUID = () => {
 };
 
 var functionalElementFactory = (dependencies) => {
-    const { LitElement, createUseState, createUseEffect, runEffect, createUseReducer, createUseContext } = dependencies;
+    const { LitElement, createUseState, createUseEffect, createUseReducer, createUseContext } = dependencies;
 
     return (render, props = {}, styles = []) => {
         return class extends LitElement {
@@ -158,29 +187,34 @@ var functionalElementFactory = (dependencies) => {
 
                 this._reducerStateKey = 0;
                 this._stateKey = 0;
-                this._hookKey = 0;
-                this._hooks = [];
-                this._hookState = [];
+                this._effectKey = 0;
+                this._effects = [];
+                this._effectsState = new Map();
             }
 
             _resetHooks() {
                 this._stateKey = 0;
                 this._reducerStateKey = 0;
-                this._hookKey = 0;
+                this._effectKey = 0;
+                this._effects = [];
             }
 
             _runEffects() {
-                this._hooks.forEach((effect) => {
-                    return new Promise((resolve) => {
-                        return resolve(effect())
+                return this._effects.map((effect) => {
+                    return new Promise((resolve, reject) => {
+                        try {
+                            return resolve(effect());
+                        } catch (e) {
+                            reject(e);
+                        }
                     });
                 });
             }
 
             render() {
                 super.render();
-                this._resetHooks();
                 this._runEffects();
+                this._resetHooks();
                 const hooks = {
                     useState: createUseState(this),
                     useEffect: createUseEffect(this),
@@ -194,7 +228,7 @@ var functionalElementFactory = (dependencies) => {
 };
 
 const createContext = createContextFactory({directive, PropertyPart});
-const functionalElement = functionalElementFactory({ LitElement, createUseState, createUseEffect, runEffect, createUseReducer, createUseContext });
+const functionalElement = functionalElementFactory({ LitElement, createUseState, createUseEffect, createUseReducer, createUseContext });
 
 export default functionalElement;
 export { createContext };

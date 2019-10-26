@@ -23,8 +23,7 @@ export const createUseState = (element) => {
             setState(currentStateKey, newValue)
         };
 
-        const valueAndChanger = [getState(currentStateKey), changeValue];
         element._stateKey++;
-        return valueAndChanger;
+        return [getState(currentStateKey), changeValue];
     };
 };

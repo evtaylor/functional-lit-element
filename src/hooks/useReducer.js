@@ -1,19 +1,28 @@
 
 export const createUseReducer = (element) => {
+    const getReducerState = (key) => {
+        return element._dynamicReducerState.get(key);
+    };
+
+    const setReducerState = (key, value)  => {
+        const newState = new Map(Array.from(element._dynamicReducerState.entries()));
+        newState.set(key, value);
+        element._dynamicReducerState = newState;
+    };
+
     return (reducer, initialState) => {
-        if (typeof element._dynamicReducerState[element._reducerStateKey] === 'undefined') {
-            element._dynamicReducerState[element._reducerStateKey] = Object.assign({}, element._dynamicReducerState[element._reducerStateKey], initialState);
+        const currentKey = element._reducerStateKey;
+
+        if (getReducerState(currentKey) === undefined) {
+            setReducerState(currentKey, initialState);
         }
 
-        const currentStateKey = element._reducerStateKey;
         const dispatch = (action) => {
-            // debugger;
-            const newState = reducer(element._dynamicReducerState[currentStateKey], action);
-            element._dynamicReducerState[currentStateKey] = Object.assign({}, element._dynamicReducerState[currentStateKey], newState);
+            const newState = reducer(getReducerState(currentKey), action);
+            setReducerState(currentKey, newState);
         };
 
-        const stateAndDispatch = [element._dynamicReducerState[element._reducerStateKey], dispatch];
         element._reducerStateKey++;
-        return stateAndDispatch;
+        return [getReducerState(currentKey), dispatch];
     }
 };
