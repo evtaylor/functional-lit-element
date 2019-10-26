@@ -13,5 +13,4 @@ const functionalElement = functionalElementFactory({ LitElement, createUseState,
 
 export default functionalElement;
 export { createContext };
-export { css, html } from "lit-element";
 

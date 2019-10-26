@@ -7,7 +7,7 @@
   "license": "BSD-3-Clause",
   "dependencies": {
     "lit-element": "^2.2.1",
-    "sinon": "^7.5.0"
+    "lit-html": "^1.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
@@ -20,10 +20,12 @@
     "rollup-plugin-babel-minify": "^9.1.0",
     "rollup-plugin-exclude-dependencies-from-bundle": "^1.1.2",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "showroom": "^0.9.3"
+    "showroom": "^0.9.3",
+    "sinon": "^7.5.0"
   },
   "scripts": {
-    "test": "npx mocha --recursive \"./test/*test.js\" --exit --require @babel/register --require @babel/polyfill",
-    "build": "npx rollup -c"
+    "test": "npx mocha --recursive \"./test/**/*test.js\" --exit --require @babel/register --require @babel/polyfill",
+    "build": "npx rollup -c",
+    "build:examples": "npx rollup --config examples.rollup.config.js"
   }
 }

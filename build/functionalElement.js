@@ -1,5 +1,4 @@
 import { LitElement } from 'lit-element';
-export { css, html } from 'lit-element';
 import { directive, PropertyPart } from 'lit-html';
 
 const createUseState = (element) => {
@@ -26,9 +25,8 @@ const createUseState = (element) => {
             setState(currentStateKey, newValue);
         };
 
-        const valueAndChanger = [getState(currentStateKey), changeValue];
         element._stateKey++;
-        return valueAndChanger;
+        return [getState(currentStateKey), changeValue];
     };
 };
 
@@ -90,21 +88,30 @@ const createUseEffect = (element) => {
 };
 
 const createUseReducer = (element) => {
+    const getReducerState = (key) => {
+        return element._dynamicReducerState.get(key);
+    };
+
+    const setReducerState = (key, value)  => {
+        const newState = new Map(Array.from(element._dynamicReducerState.entries()));
+        newState.set(key, value);
+        element._dynamicReducerState = newState;
+    };
+
     return (reducer, initialState) => {
-        if (typeof element._dynamicReducerState[element._reducerStateKey] === 'undefined') {
-            element._dynamicReducerState[element._reducerStateKey] = Object.assign({}, element._dynamicReducerState[element._reducerStateKey], initialState);
+        const currentKey = element._reducerStateKey;
+
+        if (getReducerState(currentKey) === undefined) {
+            setReducerState(currentKey, initialState);
         }
 
-        const currentStateKey = element._reducerStateKey;
         const dispatch = (action) => {
-            // debugger;
-            const newState = reducer(element._dynamicReducerState[currentStateKey], action);
-            element._dynamicReducerState[currentStateKey] = Object.assign({}, element._dynamicReducerState[currentStateKey], newState);
+            const newState = reducer(getReducerState(currentKey), action);
+            setReducerState(currentKey, newState);
         };
 
-        const stateAndDispatch = [element._dynamicReducerState[element._reducerStateKey], dispatch];
         element._reducerStateKey++;
-        return stateAndDispatch;
+        return [getReducerState(currentKey), dispatch];
     }
 };
 
@@ -181,7 +188,7 @@ var functionalElementFactory = (dependencies) => {
 
             constructor() {
                 super();
-                this._dynamicReducerState = {};
+                this._dynamicReducerState = new Map();
                 this._dynamicState = new Map();
                 this._context = {};
 
@@ -221,6 +228,7 @@ var functionalElementFactory = (dependencies) => {
                     useReducer: createUseReducer(this),
                     useContext: createUseContext(this)
                 };
+                // Todo: only pass props, not `this`
                 return render(this, hooks);
             }
         };

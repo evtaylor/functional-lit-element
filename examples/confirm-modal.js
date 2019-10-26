@@ -1,4 +1,4 @@
-import functionalElement, { html, css } from '../dist/web/functionalElement.min.js';
+import functionalElement from '../build/functionalElement.js';
 import { ThemeContext } from './main-page.js';
 
 const hostStyles = css`   
