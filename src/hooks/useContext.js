@@ -5,7 +5,7 @@ export const createUseContext = (element) => {
     }
 };
 
-export const createContextFactory = (dependencies) => {
+export const createContextProvider = (dependencies) => {
     const {directive, PropertyPart} = dependencies;
     //createContext
     return (defaultData) => {

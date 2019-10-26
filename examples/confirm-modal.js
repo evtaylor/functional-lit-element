@@ -1,4 +1,7 @@
-import functionalElement from '../build/functionalElement.js';
+import functionalElementFactory from '../build/browser/functionalElement.js';
+import { LitElement, html, css } from '../web_modules/lit-element.js';
+const functionalElement = functionalElementFactory(LitElement);
+
 import { ThemeContext } from './main-page.js';
 
 const hostStyles = css`   

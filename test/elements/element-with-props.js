@@ -1,4 +1,7 @@
-import functionalElement, { html } from '../../dist/web/functionalElement.js';
+import functionalElementFactory from '../../build/browser/functionalElement.js';
+import { html, LitElement } from '../../web_modules/lit-element.js';
+
+const functionalElement = functionalElementFactory(LitElement);
 
 const props = {
     testBool: { type: Boolean, reflect: true },

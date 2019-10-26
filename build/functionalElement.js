@@ -122,7 +122,7 @@ const createUseContext = (element) => {
     }
 };
 
-const createContextFactory = (dependencies) => {
+const createContextProvider = (dependencies) => {
     const {directive, PropertyPart} = dependencies;
     //createContext
     return (defaultData) => {
@@ -235,7 +235,7 @@ var functionalElementFactory = (dependencies) => {
     };
 };
 
-const createContext = createContextFactory({directive, PropertyPart});
+const createContext = createContextProvider({directive, PropertyPart});
 const functionalElement = functionalElementFactory({ LitElement, createUseState, createUseEffect, createUseReducer, createUseContext });
 
 export default functionalElement;

@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { createUseContext, createContextFactory } from '../../src/hooks/useContext';
+import { createUseContext, createContextProvider } from '../../src/hooks/useContext';
 import functionalElementFactory from '../../src/functionalElement';
 import sinon from "sinon";
 
@@ -11,7 +11,7 @@ describe('useContext', () => {
             hello: "world"
         };
 
-        const createContext = createContextFactory({directive: directiveFake, PropertyPart});
+        const createContext = createContextProvider({directive: directiveFake, PropertyPart});
         const context = createContext(contextData);
         assert(context._contextName.length > 0)
     });

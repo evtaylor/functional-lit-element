@@ -4,12 +4,12 @@ import { directive, PropertyPart } from "lit-html";
 import { createUseState } from "./hooks/useState";
 import { createUseEffect } from "./hooks/useEffect";
 import { createUseReducer } from "./hooks/useReducer";
-import { createUseContext, createContextFactory } from "./hooks/useContext";
+import { createUseContext, createContextProvider } from "./hooks/useContext";
 
-import functionalElementFactory from './functionalElement';
+import functionalElementProvider from './functionalElement';
 
-const createContext = createContextFactory({directive, PropertyPart});
-const functionalElement = functionalElementFactory({ LitElement, createUseState, createUseEffect, createUseReducer, createUseContext });
+const createContext = createContextProvider({directive, PropertyPart});
+const functionalElement = functionalElementProvider({ LitElement, createUseState, createUseEffect, createUseReducer, createUseContext });
 
 export default functionalElement;
 export { createContext };

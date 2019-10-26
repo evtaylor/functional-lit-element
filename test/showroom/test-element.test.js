@@ -19,11 +19,6 @@ describe('test-component', () => {
 
     it('do basic render', async function() {
         await showroom.setTestSubject('test-element');
-
-        // const component = await showroom.setAttribute('title', 'Cool Title');
-        // const result = await(await showroom.page.evaluate((target, name) => {
-        //     return target
-        // }, component));
         const p = await showroom.find('// p');
         const text = await showroom.getTextContent(p);
         assert.strictEqual(text, "Hello World");

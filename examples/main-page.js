@@ -1,4 +1,8 @@
-import functionalElement, { createContext } from '../build/functionalElement.js';
+import functionalElementFactory, { createContextFactory } from '../build/browser/functionalElement.js';
+import { LitElement, html } from '../web_modules/lit-element.js';
+import { directive, PropertyPart } from '../web_modules/lit-html.js';
+const functionalElement = functionalElementFactory(LitElement);
+const createContext = createContextFactory(directive, PropertyPart);
 
 const props = {
     title: { type: String, reflect: true },
