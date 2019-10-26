@@ -1,6 +1,6 @@
 {
   "name": "webcomponents",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "build/functionalElement.js",
   "module": "build/functionalElement.js",
   "author": "Evan Taylor",
@@ -28,6 +28,9 @@
     "test": "npx mocha --recursive \"./test/**/*test.js\" --exit --require @babel/register --require @babel/polyfill",
     "build": "npx rollup -c",
     "build:test": "npx @pika/web && npx rollup -c browser.rollup.config.js"
+  },
+  "peerDependencies": {
+    "lit-element": "2.x"
   },
   "@pika/web": {
     "webDependencies": [
