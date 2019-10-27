@@ -5,26 +5,28 @@ import functionalElementFactory from '../../src/functionalElement';
 
 describe('useEffect', () => {
     it('triggers effect to be run at render time', async function() {
-        const element = getTestComponent();
-        const useEffect = createUseEffect(element);
         const anEffect = sinon.spy();
-
-        useEffect(anEffect);
-
-        // simulate a component rerender
+        const render = (props, hooks) => {
+            const { useEffect } = hooks;
+            useEffect(anEffect);
+        };
+        const element = getTestComponent(render);
         element.render();
 
         assert(anEffect.calledOnce)
     });
 
     it('handles multiple effects', async function() {
-        const element = getTestComponent();
-        const useEffect = createUseEffect(element);
+
         const anEffect1 = sinon.spy();
         const anEffect2 = sinon.spy();
 
-        useEffect(anEffect1);
-        useEffect(anEffect2);
+        const render = (props, hooks) => {
+            const { useEffect } = hooks;
+            useEffect(anEffect1);
+            useEffect(anEffect2);
+        };
+        const element = getTestComponent(render);
 
         // simulate a component rerender
         element.render();
@@ -34,60 +36,63 @@ describe('useEffect', () => {
     });
 
     it('runs effect on each render when no state is watched', async function() {
-        const element = getTestComponent();
-        const useEffect = createUseEffect(element);
         const anEffect = sinon.spy();
 
-        useEffect(anEffect);
-        element.render();
+        const render = (props, hooks) => {
+            const { useEffect } = hooks;
+            useEffect(anEffect);
+        };
+        const element = getTestComponent(render);
 
-        useEffect(anEffect);
+        element.render();
         element.render();
 
         assert(anEffect.calledTwice)
     });
 
     it('runs effect only once when state hasn\'t changed', async function() {
-        const element = getTestComponent();
-        const useEffect = createUseEffect(element);
         const anEffect = sinon.spy();
         const state = 1;
 
-        useEffect(anEffect, [state]);
-        element.render();
+        const render = (props, hooks) => {
+            const { useEffect } = hooks;
+            useEffect(anEffect, [state]);
+        };
 
-        useEffect(anEffect, [state]);
+        const element = getTestComponent(render);
+
+        element.render();
         element.render();
 
         assert(anEffect.calledOnce)
     });
 
     it('runs effect only once empty state provided', async function() {
-        const element = getTestComponent();
-        const useEffect = createUseEffect(element);
         const anEffect = sinon.spy();
+        const render = (props, hooks) => {
+            const { useEffect } = hooks;
+            useEffect(anEffect, []);
+        };
+        const element = getTestComponent(render);
 
-        useEffect(anEffect, []);
         element.render();
-
-        useEffect(anEffect, []);
         element.render();
 
         assert(anEffect.calledOnce)
     });
 });
 
-const getTestComponent = () => {
+const getTestComponent = (testRender) => {
     const functionElement = functionalElementFactory({
         LitElement: class{
             render() {}
         },
         createUseState: () => {},
-        createUseEffect: () => {},
+        createUseEffect: createUseEffect,
         createUseReducer: () => {},
         createUseContext: () => {}
     });
 
-    const TestComponent = functionElement(() => {});
+    const TestComponent = functionElement(testRender);
     return new TestComponent();
 };

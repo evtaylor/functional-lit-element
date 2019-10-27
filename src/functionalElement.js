@@ -50,7 +50,6 @@ export default (dependencies) => {
 
             render() {
                 super.render();
-                this._runEffects();
                 this._resetHooks();
                 const hooks = {
                     useState: createUseState(this),
@@ -59,7 +58,9 @@ export default (dependencies) => {
                     useContext: createUseContext(this)
                 };
                 // Todo: only pass props, not `this`
-                return render(this, hooks);
+                const template = render(this, hooks);
+                this._runEffects();
+                return template;
             }
         };
     };
