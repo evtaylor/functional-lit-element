@@ -11,9 +11,9 @@ export default [
             sourcemap: true
         },
         plugins: [
-            minify({
-                comments: false
-            })
+            // minify({
+            //     comments: false
+            // })
         ]
     }
 ];

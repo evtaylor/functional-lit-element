@@ -1,5 +1,5 @@
 export default (dependencies) => {
-    const { LitElement, createUseState, createUseEffect, createUseReducer, createUseContext } = dependencies;
+    const { LitElement, createUseState, createUseEffect, createUseReducer, createUseContext, createProvideContext } = dependencies;
 
     return (render, props = {}, styles = []) => {
         return class extends LitElement {
@@ -27,6 +27,8 @@ export default (dependencies) => {
                 this._effectKey = 0;
                 this._effects = [];
                 this._effectsState = new Map();
+
+                this._contextWatchers = [];
             }
 
             _resetHooks() {
@@ -55,12 +57,19 @@ export default (dependencies) => {
                     useState: createUseState(this),
                     useEffect: createUseEffect(this),
                     useReducer: createUseReducer(this),
-                    useContext: createUseContext(this)
+                    useContext: createUseContext(this),
+                    provideContext: createProvideContext(this)
                 };
                 // Todo: only pass props, not `this`
                 const template = render(this, hooks);
                 this._runEffects();
                 return template;
+            }
+
+            connectedCallback() {
+                super.connectedCallback();
+                let connected = new Event('connected');
+                this.dispatchEvent(connected);
             }
         };
     };
