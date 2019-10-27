@@ -82,7 +82,7 @@ describe('useEffect', () => {
     });
 });
 
-const getTestComponent = (testRender) => {
+const getTestComponent = (renderFn) => {
     const functionElement = functionalElementFactory({
         LitElement: class{
             render() {}
@@ -93,6 +93,6 @@ const getTestComponent = (testRender) => {
         createUseContext: () => {}
     });
 
-    const TestComponent = functionElement(testRender);
+    const TestComponent = functionElement(renderFn);
     return new TestComponent();
 };
