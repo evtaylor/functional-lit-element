@@ -4,8 +4,6 @@ import functionalElementFactory from '../../src/functionalElement';
 
 describe('useReducer', () => {
     it('returns updated value when changed on next render', async function() {
-        const element = getTestComponent();
-        const useReducer = createUseReducer(element);
         const initialState = { count: 0 };
         const reducer = (state, action) => {
             switch (action.type) {
@@ -18,19 +16,29 @@ describe('useReducer', () => {
             }
         };
 
-        const [state, dispatch] = useReducer(reducer, initialState);
-        dispatch({type: 'increment'});
+        let testState = undefined;
+        let testDispatch = undefined;
 
-        // simulate a component rerender
+        const render = (props, hooks) => {
+            const { useReducer } = hooks;
+            const [state, dispatch] = useReducer(reducer, initialState);
+            testState = state;
+            testDispatch = dispatch;
+        };
+
+        const element = getTestComponent(render);
         element.render();
 
-        const [updatedState, newDispatch] = useReducer(reducer, initialState);
-        assert.deepStrictEqual(updatedState, {count: 1});
+        // assert default state is set
+        assert.deepStrictEqual(testState, {count: 0});
+
+        testDispatch({type: 'increment'});
+        element.render();
+
+        assert.deepStrictEqual(testState, {count: 1});
     });
 
     it('handles multiple instances of useReducer', async function() {
-        const element = getTestComponent();
-        const useReducer = createUseReducer(element);
         const initialState1 = { count: 0 };
         const initialState2 = { isLoading: true };
         const reducer1 = (state, action) => {
@@ -51,37 +59,50 @@ describe('useReducer', () => {
             }
         };
 
-        const [state1, dispatch1] = useReducer(reducer1, initialState1);
-        const [state2, dispatch2] = useReducer(reducer2, initialState2);
+        let testState1 = undefined;
+        let testDispatch1 = undefined;
+        let testState2 = undefined;
+        let testDispatch2 = undefined;
+
+        const render = (props, hooks) => {
+            const { useReducer } = hooks;
+            const [state1, dispatch1] = useReducer(reducer1, initialState1);
+            const [state2, dispatch2] = useReducer(reducer2, initialState2);
+            testState1 = state1;
+            testDispatch1 = dispatch1;
+            testState2 = state2;
+            testDispatch2 = dispatch2;
+        };
+
+        const element = getTestComponent(render);
+        element.render();
 
         // assert initial reducer state
-        assert.deepStrictEqual(state1, {count: 0});
-        assert.deepStrictEqual(state2, {isLoading: true});
+        assert.deepStrictEqual(testState1, {count: 0});
+        assert.deepStrictEqual(testState2, {isLoading: true});
 
-        dispatch1({type: 'increment'});
-        dispatch2({type: 'loaded'});
+        testDispatch1({type: 'increment'});
+        testDispatch2({type: 'loaded'});
 
         // simulate a component rerender
         element.render();
 
-        const [updatedState1, newDispatch1] = useReducer(reducer1, initialState1);
-        const [updatedState2, newDispatch2] = useReducer(reducer2, initialState2);
-        assert.deepStrictEqual(updatedState1, {count: 1});
-        assert.deepStrictEqual(updatedState2, {isLoading: false});
+        assert.deepStrictEqual(testState1, {count: 1});
+        assert.deepStrictEqual(testState2, {isLoading: false});
     });
 });
 
-const getTestComponent = () => {
+const getTestComponent = (renderFn) => {
     const functionElement = functionalElementFactory({
         LitElement: class{
             render() {}
         },
         createUseState: () => {},
         createUseEffect: () => {},
-        createUseReducer: () => {},
+        createUseReducer: createUseReducer,
         createUseContext: () => {}
     });
 
-    const TestComponent = functionElement(() => {});
+    const TestComponent = functionElement(renderFn);
     return new TestComponent();
 };

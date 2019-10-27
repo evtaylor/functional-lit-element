@@ -17,7 +17,7 @@ describe('useContext', () => {
     });
 
     it('useContext returns data from context property', async function () {
-        const testElement = getTestComponent();
+
         const testContextName = 'abc123';
         const fakeContextData = {
             hello: "world"
@@ -25,15 +25,22 @@ describe('useContext', () => {
         const fakeContext = {
             _contextName: testContextName
         };
-        testElement._context[testContextName] = fakeContextData;
 
-        const useContext = createUseContext(testElement);
-        const result = useContext(fakeContext);
-        assert.deepStrictEqual(result, fakeContextData)
+        let testResult = undefined;
+
+        const render = (props, hooks) => {
+            const { useContext } = hooks;
+            testResult = useContext(fakeContext);
+        };
+        const component = getTestComponent(render);
+        component._context[testContextName] = fakeContextData;
+        component.render();
+
+        assert.deepStrictEqual(testResult, fakeContextData)
     });
 });
 
-const getTestComponent = () => {
+const getTestComponent = (renderFn) => {
     const functionElement = functionalElementFactory({
         LitElement: class{
             render() {}
@@ -41,9 +48,9 @@ const getTestComponent = () => {
         createUseState: () => {},
         createUseEffect: () => {},
         createUseReducer: () => {},
-        createUseContext: () => {}
+        createUseContext: createUseContext
     });
 
-    const TestComponent = functionElement(() => {});
+    const TestComponent = functionElement(renderFn);
     return new TestComponent();
 };
