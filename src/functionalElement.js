@@ -28,7 +28,8 @@ export default (dependencies) => {
                 this._effects = [];
                 this._effectsState = new Map();
 
-                this._contextWatchers = [];
+                this._contextListeners = new Map();
+                this._contextParents = new Map();
             }
 
             _resetHooks() {
@@ -66,10 +67,18 @@ export default (dependencies) => {
                 return template;
             }
 
-            connectedCallback() {
-                super.connectedCallback();
-                let connected = new Event('connected');
-                this.dispatchEvent(connected);
+            disconnectedCallback() {
+                super.disconnectedCallback();
+                const contexts = Object.keys(this._context);
+                contexts.forEach((contextName) => {
+                    const listener = this._contextListeners.get(contextName);
+                    const parentContext = this._contextParents.get(contextName);
+                    if (parentContext) {
+                        parentContext.removeEventListener('contextChanged', listener);
+                    }
+                });
+                this._contextListeners = new Map();
+                this._contextParents = new Map();
             }
         };
     };

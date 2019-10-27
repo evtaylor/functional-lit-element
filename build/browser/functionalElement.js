@@ -112,37 +112,10 @@ const createUseReducer = (element) => {
     }
 };
 
-//
-// const customElementObserver = () => new MutationObserver((mutationList, observer) => {
-//     mutationList.forEach((mutation) => {
-//         mutation.addedNodes.forEach((node) => {
-//             node.childNodes.forEach((child) => {
-//                 if (isCustomElement(child)) {
-//                     console.log(child);
-//                     child.addEventListener('connected', (e) => {
-//                         // debugger;
-//                         console.log('connected', e.target,  e.target._context);
-//                         //console.log(e.target.shadowRoot)
-//
-//                         // e._context[context.name] = context._data;
-//                     })
-//                 }
-//             })
-//         });
-//     })
-// });
-//
-// observer.observe(element.shadowRoot, {subtree: true, childList: true});
-
-
 const createProvideContext = (element) => {
-    const updateWatchers = (context, newValue) => {
-        element._context[context.name] = newValue;
-        element._contextWatchers = element._contextWatchers.filter((watcher) => {
-            watcher._context = Object.assign({}, {[context.name]: newValue});
-            debugger;
-            return element.contains(watcher)
-        });
+    const dispatchContextChange = (contextName) => {
+        const contextChanged = new Event('contextChanged');
+        element.dispatchEvent(contextChanged);
     };
 
     return (context, value = undefined) => {
@@ -157,11 +130,12 @@ const createProvideContext = (element) => {
         }
 
         if (changed) {
-            updateWatchers(context, element._context[context.name]);
+            dispatchContextChange(context.name);
         }
 
         return (newContext) => {
-            updateWatchers(context, newContext);
+            element._context[context.name] = newContext;
+            dispatchContextChange(context.name);
         }
     }
 
@@ -169,8 +143,17 @@ const createProvideContext = (element) => {
 
 const createUseContext = (element) => {
     return (context) => {
+        if (element._contextListeners.get(context.name)) {
+            return element._context[context.name];
+        }
+
         const contextParent = getParentWithContext(element, context.name);
-        contextParent._contextWatchers.push(element);
+        const contextListener = () => {
+            element._context = Object.assign({}, {[context.name]: contextParent._context[context.name]});
+        };
+        contextParent.addEventListener('contextChanged', contextListener);
+        element._contextListeners.set(context.name, contextListener);
+        element._contextParents.set(context.name, contextParent);
         return contextParent._context[context.name];
     }
 };
@@ -260,7 +243,8 @@ var functionalElementProvider = (dependencies) => {
                 this._effects = [];
                 this._effectsState = new Map();
 
-                this._contextWatchers = [];
+                this._contextListeners = new Map();
+                this._contextParents = new Map();
             }
 
             _resetHooks() {
@@ -298,10 +282,18 @@ var functionalElementProvider = (dependencies) => {
                 return template;
             }
 
-            connectedCallback() {
-                super.connectedCallback();
-                let connected = new Event('connected');
-                this.dispatchEvent(connected);
+            disconnectedCallback() {
+                super.disconnectedCallback();
+                const contexts = Object.keys(this._context);
+                contexts.forEach((contextName) => {
+                    const listener = this._contextListeners.get(contextName);
+                    const parentContext = this._contextParents.get(contextName);
+                    if (parentContext) {
+                        parentContext.removeEventListener('contextChanged', listener);
+                    }
+                });
+                this._contextListeners = new Map();
+                this._contextParents = new Map();
             }
         };
     };

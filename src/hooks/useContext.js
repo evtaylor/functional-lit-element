@@ -1,34 +1,8 @@
-//
-// const customElementObserver = () => new MutationObserver((mutationList, observer) => {
-//     mutationList.forEach((mutation) => {
-//         mutation.addedNodes.forEach((node) => {
-//             node.childNodes.forEach((child) => {
-//                 if (isCustomElement(child)) {
-//                     console.log(child);
-//                     child.addEventListener('connected', (e) => {
-//                         // debugger;
-//                         console.log('connected', e.target,  e.target._context);
-//                         //console.log(e.target.shadowRoot)
-//
-//                         // e._context[context.name] = context._data;
-//                     })
-//                 }
-//             })
-//         });
-//     })
-// });
-//
-// observer.observe(element.shadowRoot, {subtree: true, childList: true});
-
 
 export const createProvideContext = (element) => {
-    const updateWatchers = (context, newValue) => {
-        element._context[context.name] = newValue;
-        element._contextWatchers = element._contextWatchers.filter((watcher) => {
-            watcher._context = Object.assign({}, {[context.name]: newValue});
-            debugger;
-            return element.contains(watcher)
-        })
+    const dispatchContextChange = (contextName) => {
+        const contextChanged = new Event('contextChanged');
+        element.dispatchEvent(contextChanged);
     };
 
     return (context, value = undefined) => {
@@ -43,11 +17,12 @@ export const createProvideContext = (element) => {
         }
 
         if (changed) {
-            updateWatchers(context, element._context[context.name])
+            dispatchContextChange(context.name)
         }
 
         return (newContext) => {
-            updateWatchers(context, newContext)
+            element._context[context.name] = newContext;
+            dispatchContextChange(context.name)
         }
     }
 
@@ -55,8 +30,17 @@ export const createProvideContext = (element) => {
 
 export const createUseContext = (element) => {
     return (context) => {
+        if (element._contextListeners.get(context.name)) {
+            return element._context[context.name];
+        }
+
         const contextParent = getParentWithContext(element, context.name);
-        contextParent._contextWatchers.push(element);
+        const contextListener = () => {
+            element._context = Object.assign({}, {[context.name]: contextParent._context[context.name]});
+        };
+        contextParent.addEventListener('contextChanged', contextListener);
+        element._contextListeners.set(context.name, contextListener);
+        element._contextParents.set(context.name, contextParent);
         return contextParent._context[context.name];
     }
 };
@@ -79,11 +63,11 @@ const getParent = (node, contextName) => {
     }
 
     return null;
-}
+};
 
 const hasContext = (node, contextName) => {
     return node._context && node._context[contextName] !== undefined;
-}
+};
 
 export const createContextProvider = (dependencies) => {
     const {directive, PropertyPart} = dependencies;
