@@ -5,15 +5,23 @@ export const createProvideContext = (element) => {
         element.dispatchEvent(contextChanged);
     };
 
+    const getContext = (id) => {
+        return element._context.get(id)
+    };
+
+    const setContext = (id, data) => {
+        element._context.set(id, data)
+    };
+
     return (context, value = undefined) => {
         //shallow equals
         // const changed = value !== element._context[context.id];
         // deep equals
         const changed = JSON.stringify(value) !== JSON.stringify(element._context[context.id]);
         if (value === undefined) {
-            element._context[context.id] = context.data;
+            setContext(context.id, context.data);
         } else {
-            element._context[context.id] = value;
+            setContext(context.id, value)
         }
 
         if (changed) {
@@ -21,7 +29,7 @@ export const createProvideContext = (element) => {
         }
 
         return (newContext) => {
-            element._context[context.id] = newContext;
+            setContext(context.id, newContext);
             dispatchContextChange(context)
         }
     }
@@ -31,17 +39,19 @@ export const createProvideContext = (element) => {
 export const createUseContext = (element) => {
     return (context) => {
         if (element._contextListeners.get(context.id)) {
-            return element._context[context.id];
+            return element._context.get(context.id);
         }
 
         const contextParent = getParentWithContext(element, context.id);
         const contextListener = () => {
-            element._context = Object.assign({}, {[context.id]: contextParent._context[context.id]});
+            element._context.set(context.id, contextParent._context.get(context.id));
+            element._context = new Map(Array.from(element._context.entries()))
         };
+
         contextParent.addEventListener(`contextChanged:${context.id}`, contextListener);
         element._contextListeners.set(context.id, contextListener);
         element._contextParents.set(context.id, contextParent);
-        return contextParent._context[context.id];
+        return contextParent._context.get(context.id);
     }
 };
 
@@ -66,7 +76,7 @@ const getParent = (node, contextId) => {
 };
 
 const hasContext = (node, contextId) => {
-    return node._context && node._context[contextId] !== undefined;
+    return node._context && node._context.get(contextId) !== undefined;
 };
 
 export const createContext = (defaultData) => {

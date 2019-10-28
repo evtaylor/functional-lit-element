@@ -20,7 +20,7 @@ export default (dependencies) => {
                 super();
                 this._dynamicReducerState = new Map();
                 this._dynamicState = new Map();
-                this._context = {};
+                this._context = new Map();
 
                 this._reducerStateKey = 0;
                 this._stateKey = 0;

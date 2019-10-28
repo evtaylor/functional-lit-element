@@ -118,15 +118,19 @@ const createProvideContext = (element) => {
         element.dispatchEvent(contextChanged);
     };
 
+    const setContext = (id, data) => {
+        element._context.set(id, data);
+    };
+
     return (context, value = undefined) => {
         //shallow equals
         // const changed = value !== element._context[context.id];
         // deep equals
         const changed = JSON.stringify(value) !== JSON.stringify(element._context[context.id]);
         if (value === undefined) {
-            element._context[context.id] = context.data;
+            setContext(context.id, context.data);
         } else {
-            element._context[context.id] = value;
+            setContext(context.id, value);
         }
 
         if (changed) {
@@ -134,7 +138,7 @@ const createProvideContext = (element) => {
         }
 
         return (newContext) => {
-            element._context[context.id] = newContext;
+            setContext(context.id, newContext);
             dispatchContextChange(context);
         }
     }
@@ -144,17 +148,19 @@ const createProvideContext = (element) => {
 const createUseContext = (element) => {
     return (context) => {
         if (element._contextListeners.get(context.id)) {
-            return element._context[context.id];
+            return element._context.get(context.id);
         }
 
         const contextParent = getParentWithContext(element, context.id);
         const contextListener = () => {
-            element._context = Object.assign({}, {[context.id]: contextParent._context[context.id]});
+            element._context.set(context.id, contextParent._context.get(context.id));
+            element._context = new Map(Array.from(element._context.entries()));
         };
+
         contextParent.addEventListener(`contextChanged:${context.id}`, contextListener);
         element._contextListeners.set(context.id, contextListener);
         element._contextParents.set(context.id, contextParent);
-        return contextParent._context[context.id];
+        return contextParent._context.get(context.id);
     }
 };
 
@@ -179,7 +185,7 @@ const getParent = (node, contextId) => {
 };
 
 const hasContext = (node, contextId) => {
-    return node._context && node._context[contextId] !== undefined;
+    return node._context && node._context.get(contextId) !== undefined;
 };
 
 const createContext = (defaultData) => {
@@ -226,7 +232,7 @@ var functionalElementProvider = (dependencies) => {
                 super();
                 this._dynamicReducerState = new Map();
                 this._dynamicState = new Map();
-                this._context = {};
+                this._context = new Map();
 
                 this._reducerStateKey = 0;
                 this._stateKey = 0;
