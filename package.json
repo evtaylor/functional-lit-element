@@ -6,9 +6,7 @@
   "author": "Evan Taylor",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "@pika/web": "^0.6.1",
-    "lit-element": "^2.2.1",
-    "lit-html": "^1.1.2"
+    "lit-element": "^2.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
@@ -22,7 +20,8 @@
     "rollup-plugin-exclude-dependencies-from-bundle": "^1.1.2",
     "rollup-plugin-node-resolve": "^5.2.0",
     "showroom": "^0.9.3",
-    "sinon": "^7.5.0"
+    "sinon": "^7.5.0",
+    "@pika/web": "^0.6.1"
   },
   "scripts": {
     "test": "npx mocha --recursive \"./test/**/*test.js\" --exit --require @babel/register --require @babel/polyfill",
@@ -35,8 +34,7 @@
   },
   "@pika/web": {
     "webDependencies": [
-      "lit-element",
-      "lit-html"
+      "lit-element"
     ]
   },
   "description": "A wrapper for [LitElement](https://github.com/Polymer/lit-element) which provides an API similar to React functional components.",

@@ -30,6 +30,17 @@ export default (dependencies) => {
 
                 this._contextListeners = new Map();
                 this._contextParents = new Map();
+
+                this._createHooks();
+            }
+
+            _createHooks() {
+                this._hooks = {};
+                this._hooks.useState = createUseState(this);
+                this._hooks.useEffect = createUseEffect(this);
+                this._hooks.useReducer = createUseReducer(this);
+                this._hooks.useContext = createUseContext(this);
+                this._hooks.provideContext = createProvideContext(this);
             }
 
             _resetHooks() {
@@ -55,11 +66,11 @@ export default (dependencies) => {
                 super.render();
                 this._resetHooks();
                 const hooks = {
-                    useState: createUseState(this),
-                    useEffect: createUseEffect(this),
-                    useReducer: createUseReducer(this),
-                    useContext: createUseContext(this),
-                    provideContext: createProvideContext(this)
+                    useState: this._hooks.useState,
+                    useEffect: this._hooks.useEffect,
+                    useReducer: this._hooks.useReducer,
+                    useContext: this._hooks.useContext,
+                    provideContext: this._hooks.provideContext,
                 };
                 // Todo: only pass props, not `this`
                 const template = render(this, hooks);
@@ -69,16 +80,16 @@ export default (dependencies) => {
 
             disconnectedCallback() {
                 super.disconnectedCallback();
-                const contexts = Object.keys(this._context);
-                contexts.forEach((contextName) => {
-                    const listener = this._contextListeners.get(contextName);
-                    const parentContext = this._contextParents.get(contextName);
+                const contexts = Array.from(this._contextListeners.keys());
+                contexts.forEach((contextId) => {
+                    const listener = this._contextListeners.get(contextId);
+                    const parentContext = this._contextParents.get(contextId);
                     if (parentContext) {
-                        parentContext.removeEventListener('contextChanged', listener);
+                        parentContext.removeEventListener(`contextChanged:${contextId}`, listener);
                     }
                 });
-                this._contextListeners = new Map();
-                this._contextParents = new Map();
+                this._contextListeners = null;
+                this._contextParents = null;
             }
         };
     };

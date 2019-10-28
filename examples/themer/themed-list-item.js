@@ -6,13 +6,17 @@ const functionalElement = functionalElementFactory(LitElement);
 
 const ThemedListItem = (props, hooks) => {
     const { useContext } = hooks;
-    const contextData = useContext(ThemeContext);
-    const { theme, toggleTheme } = contextData;
-    console.log('re-rendered')
+    const { theme, toggleTheme } = useContext(ThemeContext);
+
     return html`
         <style>
             .list-item {
-                background-color: ${contextData.theme.background};
+                display: inline-block;
+                float: left;
+                clear: both;
+                padding: 5px 10px 5px 5px;
+                margin: 5px;
+                background-color: ${theme.background};
                 color: ${theme.foreground}
             }
             .list-item slot {
@@ -20,8 +24,8 @@ const ThemedListItem = (props, hooks) => {
             }
         </style>
         <li class="list-item">
-            <slot></slot>
             <button @click="${() => toggleTheme()}">Toggle</button>
+            <slot></slot>
         </li>
     `;
 };

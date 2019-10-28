@@ -24,21 +24,22 @@ const props = {
 };
 
 const Themer = (props, hooks) => {
-
     const { provideContext, useState } = hooks;
     const [theme, setTheme] = useState('light');
-    const [test, setTest] = useState(false);
 
-    const setContext = provideContext(ThemeContext, {
-        theme: themes[theme],
-        toggleTheme: () => setTheme(theme === 'light' ? 'dark' : 'light')
-    });
+    const setContext = provideContext(
+        ThemeContext,
+        {
+            theme: themes[theme],
+            toggleTheme: () => setTheme(theme === 'light' ? 'dark' : 'light')
+        }
+    );
 
     return html`
         <h2>${props.title}</h2>
+        <p>Set the theme from parent</p>
         <button @click="${() => setTheme('dark')}">Dark</button>
         <button @click="${() => setTheme('light')}">Light</button>
-        <button @click="${() => setTest(!test)}">Wah</button> ${test}
         <div>
             <themed-list title="Super Themed List"></themed-list>
         </div>

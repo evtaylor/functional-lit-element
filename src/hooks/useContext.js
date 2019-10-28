@@ -5,19 +5,13 @@ export const createProvideContext = (element) => {
         element.dispatchEvent(contextChanged);
     };
 
-    const getContext = (id) => {
-        return element._context.get(id)
-    };
-
     const setContext = (id, data) => {
         element._context.set(id, data)
     };
 
-    return (context, value = undefined) => {
+    return (context, value = undefined, equalityCheck = shallowEqual) => {
         //shallow equals
-        // const changed = value !== element._context[context.id];
-        // deep equals
-        const changed = JSON.stringify(value) !== JSON.stringify(element._context[context.id]);
+        const changed = equalityCheck(value, element._context.get(context.id));
         if (value === undefined) {
             setContext(context.id, context.data);
         } else {
@@ -33,25 +27,26 @@ export const createProvideContext = (element) => {
             dispatchContextChange(context)
         }
     }
-
 };
 
 export const createUseContext = (element) => {
+    const contextListener = () => {
+        element.requestUpdate();
+    };
+
     return (context) => {
-        if (element._contextListeners.get(context.id)) {
-            return element._context.get(context.id);
+        const contextParent = element._contextParents.get(context.id);
+        if (contextParent) {
+            return contextParent._context.get(context.id);
         }
 
-        const contextParent = getParentWithContext(element, context.id);
-        const contextListener = () => {
-            element._context.set(context.id, contextParent._context.get(context.id));
-            element._context = new Map(Array.from(element._context.entries()))
-        };
+        const foundContextParent = getParentWithContext(element, context.id);
+        element._contextParents.set(context.id, foundContextParent);
 
-        contextParent.addEventListener(`contextChanged:${context.id}`, contextListener);
+        foundContextParent.addEventListener(`contextChanged:${context.id}`, contextListener);
         element._contextListeners.set(context.id, contextListener);
-        element._contextParents.set(context.id, contextParent);
-        return contextParent._context.get(context.id);
+        element._contextParents.set(context.id, foundContextParent);
+        return foundContextParent._context.get(context.id);
     }
 };
 
@@ -100,3 +95,5 @@ const id = (() => {
         return map.get(object);
     };
 })();
+
+const shallowEqual = (a, b) => a !== b;
