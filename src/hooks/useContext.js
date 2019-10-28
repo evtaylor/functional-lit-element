@@ -10,15 +10,11 @@ export const createProvideContext = (element) => {
     };
 
     return (context, value = undefined, equalityCheck = shallowEqual) => {
-        //shallow equals
-        const changed = equalityCheck(value, element._context.get(context.id));
-        if (value === undefined) {
-            setContext(context.id, context.data);
-        } else {
-            setContext(context.id, value)
-        }
+        const providedValue = value !== undefined ? value : context.defaultData;
+        const changed = equalityCheck(providedValue, element._context.get(context.id));
 
         if (changed) {
+            setContext(context.id, providedValue);
             dispatchContextChange(context)
         }
 

@@ -75,7 +75,8 @@ const getTestComponent = (renderFn) => {
         createUseState: createUseState,
         createUseEffect: () => {},
         createUseReducer: () => {},
-        createUseContext: () => {}
+        createUseContext: () => {},
+        createProvideContext: () => {}
     });
 
     const TestComponent = functionElement(renderFn);

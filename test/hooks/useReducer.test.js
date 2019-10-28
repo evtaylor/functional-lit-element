@@ -100,7 +100,8 @@ const getTestComponent = (renderFn) => {
         createUseState: () => {},
         createUseEffect: () => {},
         createUseReducer: createUseReducer,
-        createUseContext: () => {}
+        createUseContext: () => {},
+        createProvideContext: () => {}
     });
 
     const TestComponent = functionElement(renderFn);

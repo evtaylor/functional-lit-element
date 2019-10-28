@@ -1,54 +1,45 @@
 import assert from 'assert';
-import { createUseContext, createContextProvider } from '../../src/hooks/useContext';
+import { createUseContext, createContext, createProvideContext } from '../../src/hooks/useContext';
 import functionalElementFactory from '../../src/functionalElement';
 import sinon from "sinon";
 
 describe('useContext', () => {
-    it('createContext creates basic context with name', async function () {
-        const directiveFake = sinon.fake.returns(() => {});
-        const PropertyPart = class{};
-        const contextData = {
-            hello: "world"
-        };
-
-        const createContext = createContextProvider({directive: directiveFake, PropertyPart});
-        const context = createContext(contextData);
-        assert(context._contextName.length > 0)
+    before(() => {
+        global.Event = class{};
     });
 
-    it('useContext returns data from context property', async function () {
-
-        const testContextName = 'abc123';
-        const fakeContextData = {
-            hello: "world"
-        };
-        const fakeContext = {
-            _contextName: testContextName
-        };
-
-        let testResult = undefined;
-
+    it('provideContext sets context on element', function () {
+        const defaultData = { hello: "world" };
+        const context = createContext(defaultData);
         const render = (props, hooks) => {
-            const { useContext } = hooks;
-            testResult = useContext(fakeContext);
-        };
-        const component = getTestComponent(render);
-        component._context[testContextName] = fakeContextData;
-        component.render();
+            const { provideContext } = hooks;
 
-        assert.deepStrictEqual(testResult, fakeContextData)
+            provideContext(context)
+        };
+        const element = getTestComponent(render);
+        element.render();
+
+        assert.deepStrictEqual(element._context.get(context.id), defaultData)
     });
+
+    after(() => {
+        delete global.Event;
+    })
+
 });
 
 const getTestComponent = (renderFn) => {
     const functionElement = functionalElementFactory({
-        LitElement: class{
+        LitElement: class {
             render() {}
+            addEventListener() {}
+            dispatchEvent() {}
         },
         createUseState: () => {},
         createUseEffect: () => {},
         createUseReducer: () => {},
-        createUseContext: createUseContext
+        createUseContext: createUseContext,
+        createProvideContext: createProvideContext
     });
 
     const TestComponent = functionElement(renderFn);
