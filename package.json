@@ -1,5 +1,5 @@
 {
-  "name": "@evtaylor/functional-lit-element",
+  "name": "functional-lit-element",
   "version": "0.2.1",
   "main": "build/functionalElement.js",
   "module": "build/functionalElement.js",
