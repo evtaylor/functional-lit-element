@@ -88,3 +88,132 @@ const Component = (props, hooks) => {
     `;
 };
 ```
+
+### `useEffect`
+The useEffect hook allows you to perform some work after render. The function (the "effect") you provide gets executed as a promise after the render function executes. Effects have access to state and other variables in your component.
+
+```js
+const Component = (props, hooks) => {
+    const { useState, useEffect } = hooks;
+
+    const [numClicks, setNumClicks] = useState(0);
+
+    useEffect(() => {
+        document.title = `You clicked ${numClicks} times`;
+    });
+
+    return html`
+        <h2>${props.greeting}</h2>
+        <p>You have clicked: ${numClicks} times.</p>
+        <button @click="${() => setNumClicks(numClicks + 1)}">Click Me</button>
+    `;
+};
+```
+You can pass an optional second argument to useEffect specifying an array of values. If none of the values in the array have changed since the last render then the effect will be skipped. An empty array means the effect will run only once when the component first renders.
+```js
+const Component = (props, hooks) => {
+    const { useState, useEffect } = hooks;
+
+    const [numClicks, setNumClicks] = useState(0);
+
+    useEffect(() => {
+        document.title = `You clicked ${numClicks} times`;
+    }, [count]);
+
+    return html`
+        <h2>${props.greeting}</h2>
+        <p>You have clicked: ${numClicks} times.</p>
+        <button @click="${() => setNumClicks(numClicks + 1)}">Click Me</button>
+    `;
+};
+```
+
+### `useReducer`
+The `useReducer` hook is similar to the `useState` hook but allows for more complex state logic to be handled. If you are familiar with Redux that you are already familiar with how use Reducer works.
+```js
+const reducer = (state, action) => {
+    switch (action.type) {
+        case 'increment':
+            return {count: state.count + 1};
+        case 'decrement':
+            return {count: state.count - 1};
+        default:
+            throw new Error();
+    }
+};
+
+const Component = (props, hooks) => {
+    const { useReducer } = hooks;
+    const [state, dispatch] = useReducer(reducer, {count: 0});
+
+    return html`
+        <p>Count: ${state.count}</p>
+        <button @click="${() => dispatch({type: 'increment'})}">+</button>
+        <button @click="${() => dispatch({type: 'decrement'})}">-</button>
+    `;
+};
+```
+
+### `useContext`
+The `useContext` hook allows for variables to be shared with child functional lit elements in the DOM tree without needing to explicitly pass the properties all the way down. This hook consists of 3 related functions:
+- `createContext` Creates a new context
+  - Exported in the `functional-lit-element` module
+- `provideContext` Makes a context available to other child Functional Lit Elements
+  - Provided in the `hooks` argument of your render function
+- `useContext` Consumes and makes available a context that has been provided by some parent component
+  - Provided in the `hooks` argument of your render function
+
+**`themer.js`**
+```js
+import { createContext } from 'functional-lit-element';
+
+const themes = {
+    light: {
+        foreground: '#000000',
+        background: '#e5e5e5',
+    },
+    dark: {
+        foreground: '#ffffff',
+        background: '#222222',
+    },
+};
+
+const ThemeContext = createContext(themes.light);
+export {
+    ThemeContext
+};
+
+const Themer = (props, hooks) => {
+    const { provideContext, useState } = hooks;
+    const [theme, setTheme] = useState('light');
+
+    provideContext(
+        ThemeContext,
+        {
+            theme: themes[theme],
+            toggleTheme: () => setTheme(theme === 'light' ? 'dark' : 'light')
+        }
+    );
+
+    return html`
+         <themed-list></themed-list>
+    `;
+};
+
+```
+**`themed-list.js`**
+```js
+import { ThemeContext } from "./themer";
+
+const ThemedList = (props, hooks) => {
+    const { useContext } = hooks;
+    const { theme, toggleTheme } = useContext(ThemeContext);
+
+    return html`
+        <li style="background: ${theme.background}; color: ${theme.foreground};">
+            Super Styled <button @click="${() => toggleTheme()}">Toggle Theme</button>
+        </li>
+    `;
+};
+```
+In the example above the `Themer` component has also provided a function to toggle the theme as part of the ThemeContext's data. This allows the child component `ThemedList` to toggle the theme.
