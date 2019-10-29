@@ -1,6 +1,6 @@
 {
   "name": "@evtaylor/functional-lit-element",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "build/functionalElement.js",
   "module": "build/functionalElement.js",
   "author": "Evan Taylor",
