@@ -200,9 +200,12 @@ const Themer = (props, hooks) => {
     `;
 };
 
+// etc...
+
 ```
 **`themed-list.js`**
 ```js
+import functionalLitElement from 'functional-lit-element';
 import { ThemeContext } from "./themer";
 
 const ThemedList = (props, hooks) => {
@@ -215,5 +218,8 @@ const ThemedList = (props, hooks) => {
         </li>
     `;
 };
+
+const ThemedListComponent = functionalLitElement(ThemedList);
+customElements.define('themed-list', ThemedListComponent);
 ```
 In the example above the `Themer` component has also provided a function to toggle the theme as part of the ThemeContext's data. This allows the child component `ThemedList` to toggle the theme.
