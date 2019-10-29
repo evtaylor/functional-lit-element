@@ -5,7 +5,7 @@ A wrapper for [LitElement](https://github.com/Polymer/lit-element) which provide
 
 
 ## Overview
-The goal of Functional LitElement is to create web components from simple functions which receive some props and return some html (via a `TemplateResult`) which gets rendered into the DOM. Functional Lit Elements have access to 4 "Hooks" which allow for controlled side effects in the functional component and can be used in a similar way to React's [Hooks](https://reactjs.org/docs/hooks-intro.html).
+The goal of Functional LitElement is to create web components from simple functions which receive some props and return some html (via a `TemplateResult`) which gets rendered into the DOM. Functional LitElements have access to 4 "Hooks" which allow for controlled side effects in the functional component and can be used in a similar way to React's [Hooks](https://reactjs.org/docs/hooks-intro.html).
 
 ## Usage
 ### Example
@@ -42,13 +42,13 @@ functionalLitElement(render, props = {}, styles = [])
 - A function `function(props, hooks)`
   - `props` _Optional_ object map containing the properties you specified
   - `hooks` _Optional_ object containing 4 hooks
-  - **return**  `TemplateResult` produced using Lit Element's `html` [function](https://lit-html.polymer-project.org/api/modules/lit_html.html#html)
+  - **return**  `TemplateResult` produced using LitElement's `html` [function](https://lit-html.polymer-project.org/api/modules/lit_html.html#html)
   
 #### `props` _Optional_
 - Object defining the components [properties](https://lit-element.polymer-project.org/guide/properties#declare)
 
 #### `styles` _Optional_
- - `CSSResult` or array of `CSSResult` produced using Lit Element's `css` [function](https://lit-element.polymer-project.org/api/modules/_lib_css_tag_.html)
+ - `CSSResult` or array of `CSSResult` produced using LitElement's `css` [function](https://lit-element.polymer-project.org/api/modules/_lib_css_tag_.html)
 
 #### Return value
 A JS class (constructor) which can be used to register the custom element in the browser.
@@ -62,10 +62,10 @@ customElements.define('my-component', MyComponent);
 ## Usage Notes
 
 ### Properties
-Properties are declared exactly the same as a Lit Element. See the Lit Element properties [documentation](https://lit-element.polymer-project.org/guide/properties) for more info. The properties you declare determine the "props" which will be provided as the first argument of your functional component.
+Properties are declared exactly the same as a LitElement. See the LitElement properties [documentation](https://lit-element.polymer-project.org/guide/properties) for more info. The properties you declare determine the "props" which will be provided as the first argument of your functional component.
 
 ### Styles
-Styles are also declared exactly the same as a Lit Element. See the Lit Element styles [documentation](https://lit-element.polymer-project.org/guide/styles). The styles you provide are automatically scoped to your components shadow DOM tree and don't affect other elements.
+Styles are also declared exactly the same as a LitElement. See the LitElement styles [documentation](https://lit-element.polymer-project.org/guide/styles). The styles you provide are automatically scoped to your components shadow DOM tree and don't affect other elements.
 
 ### Hooks
 There are 4 hooks available to your functional component as your render function's second argument.
@@ -158,7 +158,7 @@ const Component = (props, hooks) => {
 The `useContext` hook allows for variables to be shared with child functional lit elements in the DOM tree without needing to explicitly pass the properties all the way down. This hook consists of 3 related functions:
 - `createContext` Creates a new context
   - Exported in the `functional-lit-element` module
-- `provideContext` Makes a context available to other child Functional Lit Elements
+- `provideContext` Makes a context available to other child Functional LitElements
   - Provided in the `hooks` argument of your render function
 - `useContext` Consumes and makes available a context that has been provided by some parent component
   - Provided in the `hooks` argument of your render function
@@ -223,3 +223,12 @@ const ThemedListComponent = functionalLitElement(ThemedList);
 customElements.define('themed-list', ThemedListComponent);
 ```
 In the example above the `Themer` component has also provided a function to toggle the theme as part of the ThemeContext's data. This allows the child component `ThemedList` to toggle the theme.
+
+## Examples
+1. Check out the repo
+2. Run `npm run build:examples`
+3. Open any one of the 4 examples in your browser:
+    1. `examples/click-counter/index.html`
+    1. `examples/countdown/index.html`
+    1. `examples/todo-list/index.html`
+    1. `examples/themer/index.html`
