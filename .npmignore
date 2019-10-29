@@ -1,0 +1,7 @@
+.circleci
+.showroom
+test
+node_modules
+web_modules
+browser.rollup.config.js
+rollup.config.js
