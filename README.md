@@ -64,7 +64,7 @@ npx @pika/web
 ```
 In your js file:
 ```js
-import functionalLitElement from 'web_modules/functional-lit-element.js';
+import functionalLitElement from './web_modules/functional-lit-element.js';
 ```
 
 
@@ -126,9 +126,9 @@ const styles = css`
         color: red;
         font-size: 24px;
     }
-`
+`;
 
-const Component = (props, hooks) => {
+const Component = (props) => {
     return html`
         <h2 class="my-heading">${props.greeting}</h2>
     `;
