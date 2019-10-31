@@ -1,4 +1,3 @@
-
 export default {
     component: 'test-element',
     alias: 'Functional Lit: <test-element>',

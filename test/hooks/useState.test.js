@@ -3,7 +3,7 @@ import { createUseState } from '../../src/hooks/useState';
 import functionalElementFactory from '../../src/functionalElement';
 
 describe('useState', () => {
-    it('returns updated value when changed on next render', async function() {
+    it('returns updated value when changed on next render', function() {
         const defaultState = 0;
 
         let testValue = undefined;
@@ -29,7 +29,7 @@ describe('useState', () => {
         assert.strictEqual(testValue, 10);
     });
 
-    it('handles multiple instances of useState per render', async function() {
+    it('handles multiple instances of useState per render', function() {
         const defaultState1 = 0;
         const defaultState2 = false;
 

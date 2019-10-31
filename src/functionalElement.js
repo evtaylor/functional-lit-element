@@ -2,6 +2,11 @@ export default (dependencies) => {
     const { LitElement, createUseState, createUseEffect, createUseReducer, createUseContext, createProvideContext } = dependencies;
 
     return (render, props = {}, styles = []) => {
+        const getProps = (element) => Object.keys(props).reduce((renderProps, propName) => {
+            renderProps[propName] = element[propName];
+            return renderProps;
+        }, {});
+
         return class extends LitElement {
             static get properties() {
                 const dynamicState = {
@@ -72,8 +77,7 @@ export default (dependencies) => {
                     useContext: this._hooks.useContext,
                     provideContext: this._hooks.provideContext,
                 };
-                // Todo: only pass props, not `this`
-                const template = render(this, hooks);
+                const template = render(getProps(this), hooks);
                 this._runEffects();
                 return template;
             }

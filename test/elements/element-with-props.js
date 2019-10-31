@@ -9,7 +9,6 @@ const props = {
     testFunction: { type: Object },
 };
 
-
 const TestWithProps = (props) => {
     return html`
         <input type="checkbox" checked="${props.testBool}"/>
@@ -17,5 +16,6 @@ const TestWithProps = (props) => {
         <button @click="${props.testFunction}">Button</button>
     `;
 };
+
 const TestWithPropsElement = functionalElement(TestWithProps, props);
 customElements.define('test-element-with-props', TestWithPropsElement);

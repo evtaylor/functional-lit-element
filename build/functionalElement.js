@@ -1,5 +1,4 @@
 import { LitElement } from 'lit-element';
-import { directive, PropertyPart } from 'lit-html';
 
 const createUseState = (element) => {
 
@@ -115,63 +114,110 @@ const createUseReducer = (element) => {
     }
 };
 
-const createUseContext = (element) => {
-    return (context) => {
-        const { ['_contextName']: contextName, ...contextData } = element._context[context._contextName];
-        return contextData;
-    }
-};
-
-const createContextProvider = (dependencies) => {
-    const {directive, PropertyPart} = dependencies;
-    //createContext
-    return (defaultData) => {
-        const contextName = weakUUID();
-        const context = directive((contextData = defaultData) => (part) => {
-            if (!(part instanceof PropertyPart)) {
-                throw new Error('context directive can only be used in property bindings');
-            }
-
-            contextData._contextName = contextName;
-            part.setValue(contextData);
-            part.commit();
-            setContext(part.committer.element, contextData);
-        });
-        context._contextName = contextName;
-        return context;
+const createProvideContext = (element) => {
+    const dispatchContextChange = (context) => {
+        const contextChanged = new Event(`contextChanged:${context.id}`);
+        element.dispatchEvent(contextChanged);
     };
+
+    const setContext = (id, data) => {
+        element._context.set(id, data);
+    };
+
+    return (context, value = undefined, equalityCheck = shallowEqual) => {
+        const providedValue = value !== undefined ? value : context.defaultData;
+        const changed = equalityCheck(providedValue, element._context.get(context.id));
+
+        if (changed) {
+            setContext(context.id, providedValue);
+            dispatchContextChange(context);
+        }
+
+        return (newContext) => {
+            setContext(context.id, newContext);
+            dispatchContextChange(context);
+        }
+    }
 };
 
-const setContext = (element, context) => {
-    if (isCustomElement(element.localName)) {
-        if (typeof element._context === 'undefined') element._context = {};
-        element._context[context._contextName] = context;
+const createUseContext = (element) => {
+    const contextListener = () => {
+        element.requestUpdate();
+    };
+
+    return (context) => {
+        const contextParent = element._contextParents.get(context.id);
+        if (contextParent) {
+            return contextParent._context.get(context.id);
+        }
+
+        const foundContextParent = getParentWithContext(element, context.id);
+        element._contextParents.set(context.id, foundContextParent);
+
+        foundContextParent.addEventListener(`contextChanged:${context.id}`, contextListener);
+        element._contextListeners.set(context.id, contextListener);
+        element._contextParents.set(context.id, foundContextParent);
+        return foundContextParent._context.get(context.id);
+    }
+};
+
+const getParentWithContext = (element, contextId) => {
+    return getParent(element, contextId);
+};
+
+const getParent = (node, contextId) => {
+    if (hasContext(node, contextId)) {
+        return node;
     }
 
-    Array.from(element.children).forEach((child) => {
-        setContext(child, context);
-    });
-};
-
-const isCustomElement = (elementName) => {
-    // Custom elements must have a dash in the name
-    return elementName.includes('-');
-};
-
-const weakUUID = () => {
-    function s4() {
-        return Math.floor((1 + Math.random()) * 0x10000)
-            .toString(16)
-            .substring(1);
+    if (node.parentNode) {
+        return getParent(node.parentNode, contextId);
     }
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-        s4() + '-' + s4() + s4() + s4();
+
+    if (node.host) {
+        return getParent(node.host, contextId);
+    }
+
+    return null;
 };
 
-var functionalElementFactory = (dependencies) => {
-    const { LitElement, createUseState, createUseEffect, createUseReducer, createUseContext } = dependencies;
+const hasContext = (node, contextId) => {
+    return node._context && node._context.get(contextId) !== undefined;
+};
+
+const createContext = (defaultData) => {
+    return new class {
+        constructor() {
+            this.defaultData = defaultData;
+            this.id = id(this);
+        }
+    }
+};
+
+const id = (() => {
+    let currentId = 0;
+    const map = new WeakMap();
+
+    return (object) => {
+        if (!map.has(object)) {
+            map.set(object, ++currentId);
+        }
+
+        return map.get(object);
+    };
+})();
+
+const shallowEqual = (a, b) => a !== b;
+
+var functionalElementProvider = (dependencies) => {
+    const { LitElement, createUseState, createUseEffect, createUseReducer, createUseContext, createProvideContext } = dependencies;
 
     return (render, props = {}, styles = []) => {
+        const getProps = (element) => Object.keys(props).reduce((renderProps, propName) => {
+            renderProps[propName] = element[propName];
+            return renderProps;
+        }, {});
+
         return class extends LitElement {
             static get properties() {
                 const dynamicState = {
@@ -190,13 +236,27 @@ var functionalElementFactory = (dependencies) => {
                 super();
                 this._dynamicReducerState = new Map();
                 this._dynamicState = new Map();
-                this._context = {};
+                this._context = new Map();
 
                 this._reducerStateKey = 0;
                 this._stateKey = 0;
                 this._effectKey = 0;
                 this._effects = [];
                 this._effectsState = new Map();
+
+                this._contextListeners = new Map();
+                this._contextParents = new Map();
+
+                this._createHooks();
+            }
+
+            _createHooks() {
+                this._hooks = {};
+                this._hooks.useState = createUseState(this);
+                this._hooks.useEffect = createUseEffect(this);
+                this._hooks.useReducer = createUseReducer(this);
+                this._hooks.useContext = createUseContext(this);
+                this._hooks.provideContext = createProvideContext(this);
             }
 
             _resetHooks() {
@@ -220,23 +280,37 @@ var functionalElementFactory = (dependencies) => {
 
             render() {
                 super.render();
-                this._runEffects();
                 this._resetHooks();
                 const hooks = {
-                    useState: createUseState(this),
-                    useEffect: createUseEffect(this),
-                    useReducer: createUseReducer(this),
-                    useContext: createUseContext(this)
+                    useState: this._hooks.useState,
+                    useEffect: this._hooks.useEffect,
+                    useReducer: this._hooks.useReducer,
+                    useContext: this._hooks.useContext,
+                    provideContext: this._hooks.provideContext,
                 };
-                // Todo: only pass props, not `this`
-                return render(this, hooks);
+                const template = render(getProps(this), hooks);
+                this._runEffects();
+                return template;
+            }
+
+            disconnectedCallback() {
+                super.disconnectedCallback();
+                const contexts = Array.from(this._contextListeners.keys());
+                contexts.forEach((contextId) => {
+                    const listener = this._contextListeners.get(contextId);
+                    const parentContext = this._contextParents.get(contextId);
+                    if (parentContext) {
+                        parentContext.removeEventListener(`contextChanged:${contextId}`, listener);
+                    }
+                });
+                this._contextListeners = null;
+                this._contextParents = null;
             }
         };
     };
 };
 
-const createContext = createContextProvider({directive, PropertyPart});
-const functionalElement = functionalElementFactory({ LitElement, createUseState, createUseEffect, createUseReducer, createUseContext });
+const functionalElement = functionalElementProvider({ LitElement, createUseState, createUseEffect, createUseReducer, createUseContext, createProvideContext });
 
 export default functionalElement;
 export { createContext };

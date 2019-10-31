@@ -4,7 +4,7 @@ import { createUseEffect } from '../../src/hooks/useEffect';
 import functionalElementFactory from '../../src/functionalElement';
 
 describe('useEffect', () => {
-    it('triggers effect to be run at render time', async function() {
+    it('triggers effect to be run at render time', function() {
         const anEffect = sinon.spy();
         const render = (props, hooks) => {
             const { useEffect } = hooks;
@@ -16,7 +16,7 @@ describe('useEffect', () => {
         assert(anEffect.calledOnce)
     });
 
-    it('handles multiple effects', async function() {
+    it('handles multiple effects', function() {
 
         const anEffect1 = sinon.spy();
         const anEffect2 = sinon.spy();
@@ -35,7 +35,7 @@ describe('useEffect', () => {
         assert(anEffect2.calledOnce);
     });
 
-    it('runs effect on each render when no state is watched', async function() {
+    it('runs effect on each render when no state is watched', function() {
         const anEffect = sinon.spy();
 
         const render = (props, hooks) => {
@@ -50,7 +50,7 @@ describe('useEffect', () => {
         assert(anEffect.calledTwice)
     });
 
-    it('runs effect only once when state hasn\'t changed', async function() {
+    it('runs effect only once when state hasn\'t changed', function() {
         const anEffect = sinon.spy();
         const state = 1;
 
@@ -67,7 +67,7 @@ describe('useEffect', () => {
         assert(anEffect.calledOnce)
     });
 
-    it('runs effect only once empty state provided', async function() {
+    it('runs effect only once empty state provided', function() {
         const anEffect = sinon.spy();
         const render = (props, hooks) => {
             const { useEffect } = hooks;
