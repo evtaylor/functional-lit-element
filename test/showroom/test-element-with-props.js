@@ -3,6 +3,8 @@ const assert = require('assert');
 describe('test-element-with-props', () => {
     it('should render from attributes', async function() {
         await showroom.setTestSubject('test-element-with-props');
+        // Workaround for showroom issue: https://github.com/eavichay/showroom/issues/11
+        await new Promise(resolve=>setTimeout(()=>resolve(), 10));
 
         const checkbox = await showroom.find('// input');
         const p = await showroom.find('// p');
