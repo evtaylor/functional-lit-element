@@ -17,6 +17,18 @@ describe('functionalElement', () => {
         element.render();
     });
 
+    it('return empty object if no props given', function (done) {
+        this.timeout(500);
+
+        const render = (props) => {
+            assert.deepStrictEqual(props, {});
+            done();
+        };
+
+        const element = getTestComponent(render);
+        element.render();
+    });
+
     it('element properties cant be modified by changing modifying render props', function () {
         const properties = {
             test: { type: Object }
