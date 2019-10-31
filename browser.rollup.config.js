@@ -1,5 +1,3 @@
-import minify from 'rollup-plugin-babel-minify';
-
 export default [
     {
         // If using any exports from a symlinked project, uncomment the following:
@@ -10,10 +8,5 @@ export default [
             format: 'es',
             sourcemap: true
         },
-        plugins: [
-            // minify({
-            //     comments: false
-            // })
-        ]
     }
 ];
