@@ -9,7 +9,7 @@ describe('functionalElement', () => {
         };
 
         const render = (props) => {
-            assert.deepStrictEqual(Object.keys(props), ['greeting'])
+            assert.deepStrictEqual(Object.keys(props), ['greeting']);
             done();
         };
 

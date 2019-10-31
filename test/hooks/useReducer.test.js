@@ -3,7 +3,7 @@ import { createUseReducer } from '../../src/hooks/useReducer';
 import functionalElementFactory from '../../src/functionalElement';
 
 describe('useReducer', () => {
-    it('returns updated value when changed on next render', async function() {
+    it('returns updated value when changed on next render', function() {
         const initialState = { count: 0 };
         const reducer = (state, action) => {
             switch (action.type) {
@@ -38,7 +38,7 @@ describe('useReducer', () => {
         assert.deepStrictEqual(testState, {count: 1});
     });
 
-    it('handles multiple instances of useReducer', async function() {
+    it('handles multiple instances of useReducer', function() {
         const initialState1 = { count: 0 };
         const initialState2 = { isLoading: true };
         const reducer1 = (state, action) => {
