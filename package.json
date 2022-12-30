@@ -14,7 +14,7 @@
     "@babel/preset-env": "^7.6.3",
     "@babel/register": "^7.6.2",
     "@webcomponents/webcomponentsjs": "^2.3.0",
-    "mocha": "^6.2.2",
+    "mocha": "^10.2.0",
     "rollup": "^1.25.1",
     "rollup-plugin-babel-minify": "^9.1.0",
     "rollup-plugin-exclude-dependencies-from-bundle": "^1.1.2",
